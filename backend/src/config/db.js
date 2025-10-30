@@ -8,7 +8,7 @@ const pool = mysql.createPool({
   database: "blinkit",
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,s
+  queueLimit: 0,
 });
 
 module.exports = pool;

@@ -7,4 +7,4 @@ const sendResponse = (res, statusCode, success, message, data = null) => {
   });
 };
 
-module.exports = sendResponse;
+module.exports = { sendResponse };
