@@ -131,7 +131,7 @@ export default function Register() {
 
         {/* Password */}
         <div>
-          <label className="block font-medium mb-1">Passwordsss</label>
+          <label className="block font-medium mb-1">Password</label>
           <input
             type="password"
             name="password"
