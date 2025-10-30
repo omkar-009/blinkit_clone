@@ -1,24 +1,23 @@
-import { useState } from 'react'
-import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from './components/Navbar'
-import Login from './pages/Register'
+import Navbar from "./components/Navbar";
+import Register from "./pages/Register";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <Router>
-        {/* Routes */}
-        <Routes>
-          {/* <Route path="register" element={<Login />} /> */}
-          <Route path="home" element={<Navbar />} />
-        </Routes>
+    <Router>
+      <Routes>
+        {/* Default route — redirect to /home */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-      </Router>
-    </>
-  )
+        {/* Home page with Navbar */}
+        <Route path="/home" element={<Navbar />} />
+
+        {/* Register page */}
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
