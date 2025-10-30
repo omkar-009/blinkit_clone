@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.webp";
+import HeroImage from "../assets/baner.webp";
+import Pharmacy from "../assets/pharmacy.avif";
+import Babycare from "../assets/babycare.avif";
+import Petcare from "../assets/Pet-Care.avif";
 import { ShoppingCart, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
+export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -58,7 +62,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowLogin(true)}
-              className="text-lg font-medium text-gray-700 hover:text-green-300 transition"
+              className="text-lg font-medium text-gray-700 hover:text-gray-800 transition"
             >
               Login
             </button>
@@ -70,10 +74,9 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
-
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-opacity-30 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-80 p-6 relative">
             {/* Close Button */}
             <button
@@ -143,6 +146,15 @@ export default function Navbar() {
           </div>
         </div>
       )}
+      {/* Hero Section */}
+      <div>
+        <img src={HeroImage} alt="Hero Section Image" className="w-full" />
+      </div>
+      <div className="flex w-full gap-10 items-center ml-3">
+        <img src={Pharmacy} alt="Pharmacy Section Image" className="w-60" />
+        <img src={Petcare} alt="Pet C=care Section Image" className="w-60" />
+        <img src={Babycare} alt="Baby care Section Image" className="w-60" />
+      </div>
     </>
   );
 }
