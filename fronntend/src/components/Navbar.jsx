@@ -13,7 +13,7 @@ function Navbar() {
 
           {/* Delivery Info */}
           <div className="flex flex-col leading-tight">
-            <h4 className="text-4xl md:text-base font-bold text-gray-800">
+            <h4 className="text-6xl md:text-base font-bold text-gray-800">
               Delivery in 9 minutes
             </h4>
             <p className="text-xs md:text-sm text-gray-500">
@@ -27,9 +27,6 @@ function Navbar() {
           <p className="text-xl font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Login
           </p>
-
-          {/* Future icons like Search / Cart can go here */}
-          {/* <SearchIcon /> */}
         </div>
       </nav>
     </header>

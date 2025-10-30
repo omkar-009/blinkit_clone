@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import './App.css'
 import Navbar from './components/Navbar'
-import Login from './pages/Login'
+import Login from './pages/Register'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <Login />
-      {/* <Navbar /> */}
+      <Navbar />
+      {/* <Login /> */}
     </>
   )
 }

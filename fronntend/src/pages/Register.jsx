@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import api from "../../utils/api";
 
-export default function Login() {
+export default function Register() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     contact_no: "",
     password: "",
-  });
+  });  
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function Login() {
 
     let tempErrors = {};
 
-    // ✅ Validation
+    // Validation
     if (!formData.username.trim()) tempErrors.username = "Name is required";
     if (!formData.email.trim()) tempErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
@@ -56,7 +56,7 @@ export default function Login() {
       if (response.data.success) {
         alert("Registration successful!");
 
-        // ✅ Reset form on success
+        // Reset form on success
         setFormData({
           username: "",
           email: "",
