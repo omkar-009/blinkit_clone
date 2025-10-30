@@ -10,7 +10,7 @@ export default function Navbar() {
     password: "",
   });
 
-  const navigate = useNavigate(); // ✅ moved inside component
+  const navigate = useNavigate();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
