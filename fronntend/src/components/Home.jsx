@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Products from "./Products";
 import logo from "../assets/logo.webp";
 import HeroImage from "../assets/baner.webp";
 import Pharmacy from "../assets/pharmacy.avif";
@@ -74,6 +75,7 @@ export default function Home() {
           </div>
         </nav>
       </header>
+      
       {/* Login Modal */}
       {showLogin && (
         <div className="fixed inset-0 bg-opacity-30 backdrop-blur-xs flex items-center justify-center z-50">
@@ -109,7 +111,7 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
+                <label className=" text-sm font-medium text-gray-700">
                   Password
                 </label>
                 <input
@@ -146,6 +148,7 @@ export default function Home() {
           </div>
         </div>
       )}
+
       {/* Hero Section */}
       <div>
         <img src={HeroImage} alt="Hero Section Image" className="w-full" />
@@ -155,6 +158,9 @@ export default function Home() {
         <img src={Petcare} alt="Pet C=care Section Image" className="w-60" />
         <img src={Babycare} alt="Baby care Section Image" className="w-60" />
       </div>
+      
+      {/* Products */}
+      <Products />  
     </>
   );
 }
