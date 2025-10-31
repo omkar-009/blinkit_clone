@@ -8,6 +8,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes/userRoutes');
+const homeProducts = require('./routes/dairy_product/dairyProduct');
 
 // Middlewares
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(morgan("dev"));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandler);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.get("/", (req, res) => {
@@ -28,5 +30,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", userRoutes);
+app.use("/api/products", homeProducts);
 
 module.exports = app;

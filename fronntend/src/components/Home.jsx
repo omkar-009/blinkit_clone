@@ -1,20 +1,19 @@
 import React, { useState } from "react";
+import { ShoppingCart, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Products from "./Products";
+import DairyProducts from "./DairyProducts";
+import "../App.css";
+
 import logo from "../assets/logo.webp";
 import HeroImage from "../assets/baner.webp";
 import Pharmacy from "../assets/pharmacy.avif";
 import Babycare from "../assets/babycare.avif";
 import Petcare from "../assets/Pet-Care.avif";
-import { ShoppingCart, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -29,121 +28,86 @@ export default function Home() {
   return (
     <>
       {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <nav className="max-w-7xl mx-auto flex items-center justify-evenly px-6 py-2">
-          {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <img src={logo} alt="Blinkit Logo" className="w-28 md:w-28" />
-            <div className="leading-tight">
-              <h5 className="text-lg md:text-base font-bold text-gray-800">
-                Delivery in 16 minutes
-              </h5>
-              <p className="text-xs md:text-sm text-gray-500 truncate w-44">
-                35, College Rd, Krishi Nagar, Nashik
-              </p>
+      <header className="navbar-header">
+        <nav className="navbar-container">
+          {/* Logo Section */}
+          <div className="navbar-left">
+            <img src={logo} alt="Blinkit Logo" className="logo" />
+            <div className="delivery-info">
+              <h5>Delivery in 16 minutes</h5>
+              <p>35, College Rd, Krishi Nagar, Nashik</p>
             </div>
           </div>
 
           {/* Search Bar */}
-          <div className="flex items-center flex-1 mx-6">
-            <div className="relative w-full max-w-md">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
+          <div className="navbar-search">
+            <div className="search-wrapper">
+              <Search size={18} className="search-icon" />
               <input
                 type="text"
                 placeholder='Search "paneer"'
-                className="bg-gray-50 w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-gray-300 focus:outline-none"
+                className="search-input"
               />
             </div>
           </div>
 
-          {/* Login + Cart */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowLogin(true)}
-              className="text-lg font-medium text-gray-700 hover:text-gray-800 transition"
-            >
+          {/* Login & Cart */}
+          <div className="navbar-right">
+            <button className="login-btn" onClick={() => setShowLogin(true)}>
               Login
             </button>
 
-            <button className="flex items-center bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200 transition">
-              <ShoppingCart size={22} className="mr-2" />
-              <span className="sm:inline font-medium">My Cart</span>
+            <button className="cart-btn">
+              <ShoppingCart size={22} className="cart-icon" />
+              <span>My Cart</span>
             </button>
           </div>
         </nav>
       </header>
-      
+
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-opacity-30 backdrop-blur-xs flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-80 p-6 relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowLogin(false)}
-              className="absolute top-3 right-4 text-gray-500 hover:text-gray-800"
-            >
+        <div className="modal-overlay">
+          <div className="login-modal">
+            <button className="close-btn" onClick={() => setShowLogin(false)}>
               ✕
             </button>
+            <h2>Login to Blinkit</h2>
 
-            {/* Title */}
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-              Login to Blinkit
-            </h2>
+            <form onSubmit={handleSubmit} className="login-form">
+              <label>Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
 
-            {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                />
-              </div>
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
 
-              <div>
-                <label className=" text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  className="w-full border rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-              >
+              <button type="submit" className="submit-btn">
                 Login
               </button>
             </form>
 
-            {/* Register Option */}
-            <div className="mt-4 text-center text-sm text-gray-600">
-              <p>
-                Don’t have an account?{" "}
-                <button
-                  onClick={() => navigate("/register")}
-                  className="text-green-600 font-medium hover:underline"
-                >
-                  Register
-                </button>
-              </p>
+            <div className="register-text">
+              Don’t have an account?{" "}
+              <button
+                onClick={() => navigate("/register")}
+                className="register-link"
+              >
+                Register
+              </button>
             </div>
           </div>
         </div>
@@ -151,16 +115,21 @@ export default function Home() {
 
       {/* Hero Section */}
       <div>
-        <img src={HeroImage} alt="Hero Section Image" className="w-full" />
+        <img src={HeroImage} alt="Hero Banner" className="hero-image" />
       </div>
-      <div className="flex w-full gap-10 items-center ml-3">
-        <img src={Pharmacy} alt="Pharmacy Section Image" className="w-60" />
-        <img src={Petcare} alt="Pet C=care Section Image" className="w-60" />
-        <img src={Babycare} alt="Baby care Section Image" className="w-60" />
+
+      {/* Category Banners */}
+      <div className="category-row">
+        <img src={Pharmacy} alt="Pharmacy" className="category-image" />
+        <img src={Petcare} alt="Petcare" className="category-image" />
+        <img src={Babycare} alt="Babycare" className="category-image" />
       </div>
-      
+
       {/* Products */}
-      <Products />  
+      <Products />
+
+      {/* Dairy Products Section */}
+      <DairyProducts />
     </>
   );
 }
