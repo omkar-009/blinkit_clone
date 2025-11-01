@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../App.css"; // CSS file
+import api from "../../utils/api";
+import "../App.css";
 
 export default function DairyProducts() {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/products/getallproducts")
+      api.get("/products/getallproducts")
       .then((res) => {
         if (res.data.success) {
           setProducts(res.data.data);
@@ -16,10 +19,13 @@ export default function DairyProducts() {
         }
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Error fetching products:", err);
         setError("Failed to fetch products");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, []);                        
+  }, []);
 
   return (
     <div className="section">
@@ -30,12 +36,20 @@ export default function DairyProducts() {
         </a>
       </div>
 
-      {/* Product Cards */}
+      {/* Product Card */}
       <div className="product-container">
-        {products.length > 0 ? (
+        {loading ? (
+          <p className="loading-text">Loading products...</p>
+        ) : error ? (
+          <p className="error-text" style={{ color: "red" }}>{error}</p>
+        ) : products.length > 0 ? (
           products.map((item) => (
             <div className="product-card" key={item.id}>
-              <img src={item.imageUrls[0]} alt={item.name} className="product-image" />
+              <img
+                src={item.imageUrls[0]}
+                alt={item.name}
+                className="product-image"
+              />
               <p className="product-name">{item.name}</p>
               <p className="product-weight">{item.quantity}</p>
               <p className="product-price">₹{item.price}</p>
@@ -43,7 +57,7 @@ export default function DairyProducts() {
             </div>
           ))
         ) : (
-          <p className="loading-text">Loading products...</p>
+          <p>No products found.</p>
         )}
       </div>
     </div>

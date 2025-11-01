@@ -98,15 +98,14 @@ router.post("/addproduct", upload.any(), async (req, res, next) => {
 });
 
 // Get all dairy products
-// Get all dairy products
 router.get("/getallproducts", async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM home_page_products WHERE category = 'dairy'"
+      "SELECT * FROM home_page_products"
     );
 
     if (rows.length === 0) {
-      return sendResponse(res, 404, false, "No dairy products found");
+      return sendResponse(res, 404, false, "No products found");
     }
 
     // Convert stored JSON string to array of full URLs
@@ -125,11 +124,11 @@ router.get("/getallproducts", async (req, res, next) => {
 
       return {
         ...product,
-        imageUrls: imagePaths, // frontend can use this
+        imageUrls: imagePaths,
       };
     });
 
-    return sendResponse(res, 200, true, "Dairy products fetched successfully", formattedRows);
+    return sendResponse(res, 200, true, "Home page products fetched successfully", formattedRows);
   } catch (error) {
     next(error);
   }
