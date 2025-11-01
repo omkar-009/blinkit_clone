@@ -42,9 +42,14 @@ const upload = multer({
 }); 
 
 // Add a new product
-router.post("/addproduct", upload.any(), async (req, res, next) => {
+router.post(
+  "/addproduct", 
+  upload.any(), 
+  async (req, res, next) => {
     try {
-        const { name, category, quantity, price } = req.body;
+      console.log("Request body:", req.body.details);
+
+        const { name, category, quantity, price, details } = req.body;
 
         let images = null;
       
@@ -58,14 +63,15 @@ router.post("/addproduct", upload.any(), async (req, res, next) => {
         // Insert product into database
         const [result] = await pool.query(
         `INSERT INTO home_page_products 
-                (name, category, quantity, price, images, created_at)
-                VALUES (?, ?, ?, ?, ?, NOW())`,
+                (name, category, quantity, price, images, details, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())`,
         [
             name.trim(),
             category.trim(),
             quantity.trim(),
             price,
-            images
+            images,
+            details ? details.trim() : null
         ]
         );
 
@@ -98,10 +104,12 @@ router.post("/addproduct", upload.any(), async (req, res, next) => {
 });
 
 // Get all dairy products
-router.get("/getallproducts", async (req, res, next) => {
+router.get(
+  "/dairy", 
+  async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM home_page_products"
+      "SELECT * FROM home_page_products WHERE category = 'dairy'"
     );
 
     if (rows.length === 0) {
@@ -134,5 +142,121 @@ router.get("/getallproducts", async (req, res, next) => {
   }
 });
 
+// Get all tobacco products
+router.get(
+  "/tobacco", 
+  async (req, res, next) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM home_page_products WHERE category = 'tobacco'"
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "No products found");
+    }
+
+    // Convert stored JSON string to array of full URLs
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/home_page_products/`;
+
+    const formattedRows = rows.map(product => {
+      let imagePaths = [];
+      if (product.images) {
+        try {
+          const parsed = JSON.parse(product.images);
+          imagePaths = parsed.map(filename => baseUrl + filename);
+        } catch (err) {
+          console.error("Image parse error:", err);
+        }
+      }
+
+      return {
+        ...product,
+        imageUrls: imagePaths,
+      };
+    });
+
+    return sendResponse(res, 200, true, "Home page products fetched successfully", formattedRows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get all snacks products
+router.get(
+  "/snacks", 
+  async (req, res, next) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM home_page_products WHERE category = 'snacks'"
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "No products found");
+    }
+
+    // Convert stored JSON string to array of full URLs
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/home_page_products/`;
+
+    const formattedRows = rows.map(product => {
+      let imagePaths = [];
+      if (product.images) {
+        try {
+          const parsed = JSON.parse(product.images);
+          imagePaths = parsed.map(filename => baseUrl + filename);
+        } catch (err) {
+          console.error("Image parse error:", err);
+        }
+      }
+
+      return {
+        ...product,
+        imageUrls: imagePaths,
+      };
+    });
+
+    return sendResponse(res, 200, true, "Home page products fetched successfully", formattedRows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get all cold drink products
+router.get(
+  "/tobacco", 
+  async (req, res, next) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM home_page_products WHERE category = 'tobacco'"
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "No products found");
+    }
+
+    // Convert stored JSON string to array of full URLs
+    const baseUrl = `${req.protocol}://${req.get('host')}/uploads/home_page_products/`;
+
+    const formattedRows = rows.map(product => {
+      let imagePaths = [];
+      if (product.images) {
+        try {
+          const parsed = JSON.parse(product.images);
+          imagePaths = parsed.map(filename => baseUrl + filename);
+        } catch (err) {
+          console.error("Image parse error:", err);
+        }
+      }
+
+      return {
+        ...product,
+        imageUrls: imagePaths,
+      };
+    });
+
+    return sendResponse(res, 200, true, "Home page products fetched successfully", formattedRows);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

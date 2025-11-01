@@ -3,6 +3,8 @@ import { ShoppingCart, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Products from "./Products";
 import DairyProducts from "./DairyProducts";
+import TobaccoProducts from "./Tobacco";
+import SnacksProducts from "./Snacks";
 import "../App.css";
 
 import logo from "../assets/logo.webp";
@@ -130,6 +132,12 @@ export default function Home() {
 
       {/* Dairy Products Section */}
       <DairyProducts />
+
+      {/* Tobacco Products Section */}
+      <TobaccoProducts />
+
+      {/* Snacks Products Section */}
+      <SnacksProducts />
     </>
   );
 }

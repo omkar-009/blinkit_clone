@@ -311,11 +311,11 @@
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 8px;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .product-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
 }
 
 /* Product Card */
@@ -343,15 +343,16 @@
 
 /* Text */
 .product-name {
-  font-weight: 500;
+  font-weight: 650;
   color: #333;
-  font-size: 15px;
+  font-size: 13px;
   margin: 4px 0;
   height: 36px;
   overflow: hidden;
 }
 
 .product-weight {
+  margin: 10px 110px 10px 0;
   font-size: 13px;
   color: #777;
 }
@@ -360,6 +361,7 @@
   font-weight: 600;
   color: #111;
   margin-top: 4px;
+  margin: 10px 40px 0 0;
 }
 
 /* Add Button */
@@ -373,6 +375,11 @@
   margin-top: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
+}
+
+.product-description {
+  display: inline-flex;
+
 }
 
 .add-btn:hover {

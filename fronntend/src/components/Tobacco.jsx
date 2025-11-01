@@ -3,14 +3,14 @@ import axios from "axios";
 import api from "../../utils/api";
 import "../App.css";
 
-export default function DairyProducts() {
+export default function TobaccoProducts() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      api.get("/products/dairy")
+      api.get("/products/tobacco")
       .then((res) => {
         if (res.data.success) {
           setProducts(res.data.data);
@@ -30,7 +30,7 @@ export default function DairyProducts() {
   return (
     <div className="section">
       <div className="section-header">
-        <h5>Dairy, Bread & Eggs</h5>
+        <h5>Rolling paper & tobacco</h5>
         <a href="#" className="see-all">
           see all
         </a>
