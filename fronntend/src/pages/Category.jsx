@@ -23,7 +23,7 @@ import cleaning from "../assets/cleaning.avif";
 import personal from "../assets/personal.avif";
 import pet from "../assets/pet.avif";
 
-export default function Products() {
+export default function Category() {
   const categories = [
     { image: paan },
     { image: dairy },

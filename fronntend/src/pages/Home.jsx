@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { ShoppingCart, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Products from "./Products";
+import Login from "../components/Login";
+import Categories from "./Category";
 import DairyProducts from "./DairyProducts";
 import TobaccoProducts from "./Tobacco";
 import SnacksProducts from "./Snacks";
@@ -15,17 +16,7 @@ import Petcare from "../assets/Pet-Care.avif";
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login submitted:", formData);
-    setShowLogin(false);
-  };
 
   return (
     <>
@@ -68,52 +59,7 @@ export default function Home() {
       </header>
 
       {/* Login Modal */}
-      {showLogin && (
-        <div className="modal-overlay">
-          <div className="login-modal">
-            <button className="close-btn" onClick={() => setShowLogin(false)}>
-              ✕
-            </button>
-            <h2>Login to Blinkit</h2>
-
-            <form onSubmit={handleSubmit} className="login-form">
-              <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-
-              <button type="submit" className="submit-btn">
-                Login
-              </button>
-            </form>
-
-            <div className="register-text">
-              Don’t have an account?{" "}
-              <button
-                onClick={() => navigate("/register")}
-                className="register-link"
-              >
-                Register
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Login showLogin={showLogin} setShowLogin={setShowLogin} />
 
       {/* Hero Section */}
       <div>
@@ -128,7 +74,7 @@ export default function Home() {
       </div>
 
       {/* Products */}
-      <Products />
+      <Categories />
 
       {/* Dairy Products Section */}
       <DairyProducts />

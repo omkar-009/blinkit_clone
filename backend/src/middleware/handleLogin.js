@@ -4,7 +4,15 @@ const bcrypt = require("bcrypt");
 
 const handleLogin = async (req, res, next) => {
   try {
-    const { contact_no, email, password } = req.body;
+    let { contact_no, email, identifier, password } = req.body;
+
+    if (identifier) {
+        if (identifier.includes("@")) {
+        email = identifier;
+        } else {
+        contact_no = identifier;
+        }
+    }
 
     if (!password || (!contact_no && !email)) {
       return res.status(400).json({

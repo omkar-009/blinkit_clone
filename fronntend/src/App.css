@@ -152,9 +152,11 @@
 
 .login-modal h2 {
   text-align: center;
-  font-size: 18px;
+  font-size: 22px;
+  font-weight: 600;
   margin-bottom: 16px;
-  color: #222;
+  color: #1aa849;
+  margin-bottom: 30px;
 }
 
 .login-form {
