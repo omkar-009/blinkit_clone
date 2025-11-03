@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
+import { toast } from "react-toastify";
 
 export default function Login({ showLogin, setShowLogin }) {
   const navigate = useNavigate();
@@ -19,14 +20,14 @@ export default function Login({ showLogin, setShowLogin }) {
     try {
       const res = await api.post("/user/login", formData, { withCredentials: true });
       if (res.data.success) {
-        alert("Login successful!");
+        toast.success("Login successful!");
         setShowLogin(false);
         navigate("/");
       } else {
-        setError(res.data.message || "Invalid credentials");
+        toast.error(res.data.message || "Invalid credentials");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+        toast.error(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../../utils/api";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function Register() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Handle Input Change
   const handleChange = (e) => {
@@ -54,7 +56,7 @@ export default function Register() {
       const response = await api.post("/user/register", formData);
 
       if (response.data.success) {
-        alert("Registration successful!");
+        toast.success("Registration successful!");
 
         // Reset form on success
         setFormData({
@@ -66,11 +68,11 @@ export default function Register() {
 
         setErrors({});
       } else {
-        alert(response.data.message || "Something went wrong");
+        toast.error(response.data.message || "Something went wrong");
       }
     } catch (error) {
       console.error("Registration failed:", error);
-      alert(error?.response?.data?.message || "Error registering user");
+      toast.error(error?.response?.data?.message || "Error registering user");
     } finally {
       setLoading(false);
     }
