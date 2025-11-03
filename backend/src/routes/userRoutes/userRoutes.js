@@ -1,5 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const handleLogin = require("../../middleware/handleLogin");
+const bcrypt = require("bcrypt");
+const pool = require("../../config/db");
+const { sendResponse } = require("../../utils/response");
 
 // Register a new user
 router.post(
@@ -34,7 +38,7 @@ router.post(
 
         // Check if contact number already exists
         const [contactRows] = await pool.query(
-        "SELECT * FROM users WHERE contact_number = ?",
+        "SELECT * FROM users WHERE contact_no = ?",
         [contact_no]
         );
         if (contactRows.length > 0) {
@@ -52,7 +56,7 @@ router.post(
         // Insert user into database
         const [result] = await pool.query(
         `INSERT INTO users 
-                (username, email, contact_number, password_hash, raw_password, created_at)
+                (username, email, contact_no, password_hash, raw_password, created_at)
                 VALUES (?, ?, ?, ?, ?, NOW())`,
         [
             username.trim(),
@@ -74,5 +78,11 @@ router.post(
         next(error);
     }
 });
+
+// Login route
+router.post(
+    "/login",
+    handleLogin
+);
 
 module.exports = router;

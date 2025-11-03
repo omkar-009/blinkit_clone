@@ -1,4 +1,4 @@
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 
 const Authorization = async (req, res, next) => {
@@ -31,7 +31,7 @@ const Authorization = async (req, res, next) => {
     // Check token existence in DB (revocation check)
     const [rows] = await pool.query(
       "SELECT * FROM tokens WHERE access_token = ? AND user_id = ?",
-      [token, decoded.userId]
+      [token, decoded.user_id]
     );
 
     if (rows.length === 0) {

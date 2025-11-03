@@ -1,13 +1,25 @@
 -- user table
 CREATE TABLE IF NOT EXISTS users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     contact_number VARCHAR(15),
     password_hash VARCHAR(255) NOT NULL,
-    raw_password VARCHAR(255),
+    password VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create the tokens table
+SET SESSION sql_mode = '';
+CREATE TABLE tokens (
+    token_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    access_token VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+SET SESSION sql_mode = 'STRICT_TRANS_TABLES';
 
 -- home page product table
 CREATE TABLE IF NOT EXISTS home_page_products (
