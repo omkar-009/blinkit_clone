@@ -61,7 +61,7 @@ export default function Home() {
       {/* Login Modal */}
       <Login showLogin={showLogin} setShowLogin={setShowLogin} />
 
-      {/* Hero Section */}
+      {/* Hero Section Image*/}
       <div>
         <img src={HeroImage} alt="Hero Banner" className="hero-image" />
       </div>

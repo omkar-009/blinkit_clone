@@ -12,7 +12,6 @@ export default function Register() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   // Handle Input Change
   const handleChange = (e) => {

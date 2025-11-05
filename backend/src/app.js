@@ -13,15 +13,30 @@ const homeProducts = require('./routes/dairy_product/dairyProduct');
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(morgan("dev"));
-app.use(cors({ origin: true, credentials: true }));
 app.use(express.urlencoded({ extended: true }));
-app.use(errorHandler);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.get("/", (req, res) => {
+// Serve uploads first (no logs)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { fallthrough: false }));
+
+// Use morgan but only for /api routes — skip others
+app.use(
+  morgan('dev', {
+    skip: (req) => !req.url.startsWith('/api'),
+  })
+);
+
+// custom console log for API endpoints only (simpler view)
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api')) {
+    console.log(`${req.method} ${req.originalUrl}`);
+  }
+  next();
+});
+
+// Root route
+app.get('/', (req, res) => {
   res.send(
     `<marquee>
       <h1>${process.env.DEV_MODE} server side running properly</h1>
@@ -29,7 +44,10 @@ app.get("/", (req, res) => {
   );
 });
 
-app.use("/api/user", userRoutes);
-app.use("/api/products", homeProducts);
+// Routes
+app.use('/api/user', userRoutes);
+app.use('/api/products', homeProducts);
+
+app.use(errorHandler);
 
 module.exports = app;
