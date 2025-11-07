@@ -16,7 +16,6 @@ import Babycare from "../assets/babycare.avif";
 import Petcare from "../assets/Pet-Care.avif";
 
 export default function Home() {
-  const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
 
   return (
