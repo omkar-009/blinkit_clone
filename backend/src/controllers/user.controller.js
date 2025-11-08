@@ -1,14 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const handleLogin = require("../../middleware/handleLogin");
 const bcrypt = require("bcrypt");
-const pool = require("../../config/db");
-const { sendResponse } = require("../../utils/response");
+const pool = require("../config/db");
+const { sendResponse } = require("../utils/response");
 
-// Register a new user
-router.post(
-    "/register", 
-    async (req, res, next) => {
+const registerUser = async (req, res, next) => {
     try {
         const { username, email, contact_no, password } = req.body;
 
@@ -77,12 +71,9 @@ router.post(
     } catch (error) {
         next(error);
     }
-});
+};
 
-// Login route
-router.post(
-    "/login",
-    handleLogin
-);
 
-module.exports = router;
+module.exports = {
+    registerUser
+}

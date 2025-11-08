@@ -7,8 +7,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 require('dotenv').config();
 
-const userRoutes = require('./routes/userRoutes/userRoutes');
-const homeProducts = require('./routes/dairy_product/dairyProduct');
+const userRoutes = require('./routes/user.routes');
+const homeProducts = require('./routes/homeProducts.routes');
 
 // Middlewares
 app.use(express.json());
@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/user', userRoutes);
-app.use('/api/products', homeProducts);
+app.use('/api/products', homeProducts); 
 
 app.use(errorHandler);
 
