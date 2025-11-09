@@ -89,7 +89,7 @@ const addProduct = async (req, res, next) => {
 const getDairyProducts = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM home_page_products WHERE category = 'dairy'"
+      "SELECT id, name, quantity, price, images FROM home_page_products WHERE category = 'dairy'"
     );
 
     if (rows.length === 0) {
@@ -108,7 +108,7 @@ const getDairyProducts = async (req, res, next) => {
 const getTobaccoProducts = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM home_page_products WHERE category = 'tobacco'"
+      "SELECT id, name, quantity, price, images FROM home_page_products WHERE category = 'tobacco'"
     );
 
     if (rows.length === 0) {
@@ -127,7 +127,7 @@ const getTobaccoProducts = async (req, res, next) => {
 const getSnackProducts = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      "SELECT * FROM home_page_products WHERE category = 'snacks'"
+      "SELECT id, name, quantity, price, images FROM home_page_products WHERE category = 'snacks'"
     );
 
     if (rows.length === 0) {
@@ -142,9 +142,30 @@ const getSnackProducts = async (req, res, next) => {
   }
 };
 
+// Get specific product by id
+const getProductById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await pool.query(
+      "SELECT id, name, quantity, price, images, details FROM home_page_products WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "Product not found");
+    }
+
+    return sendResponse(res, 200, true, "Product fetched successfully", rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addProduct,
   getDairyProducts,
   getTobaccoProducts,
   getSnackProducts,
+  getProductById
 };
