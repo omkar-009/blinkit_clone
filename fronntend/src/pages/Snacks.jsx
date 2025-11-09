@@ -67,7 +67,7 @@ export default function DairyProducts() {
   return (
     <div className="section">
       <div className="section-header">
-        <h5>Dairy, Bread & Eggs</h5>
+        <h5>Snacks & Munchies</h5>
         <a href="#" className="see-all">
           see all
         </a>
