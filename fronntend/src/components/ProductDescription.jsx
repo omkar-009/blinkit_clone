@@ -14,6 +14,8 @@ export default function ProductDescription() {
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,13 +28,57 @@ export default function ProductDescription() {
         if (res.data.success) {
           const productData = res.data.data;
           
-          // API now returns images as array and imageUrls as full URLs
-          // Ensure images array exists
-          if (!productData.images || !Array.isArray(productData.images)) {
-            productData.images = [];
+          // Debug: Log the product data to check image structure
+          console.log("Product data received:", productData);
+          console.log("Images (raw):", productData.images);
+          console.log("ImageUrls (raw):", productData.imageUrls);
+          
+          // Handle images - could be string (JSON) or array
+          let imageFilenames = [];
+          if (productData.images) {
+            if (typeof productData.images === 'string') {
+              try {
+                imageFilenames = JSON.parse(productData.images);
+              } catch (e) {
+                console.error("Failed to parse images string:", e);
+                imageFilenames = [];
+              }
+            } else if (Array.isArray(productData.images)) {
+              imageFilenames = productData.images;
+            }
           }
           
+          // Handle imageUrls - should be array of full URLs
+          let imageUrls = [];
+          if (productData.imageUrls) {
+            if (Array.isArray(productData.imageUrls)) {
+              imageUrls = productData.imageUrls;
+            } else if (typeof productData.imageUrls === 'string') {
+              try {
+                imageUrls = JSON.parse(productData.imageUrls);
+              } catch (e) {
+                imageUrls = [];
+              }
+            }
+          }
+          
+          // If imageUrls is empty but we have filenames, construct URLs
+          if (imageUrls.length === 0 && imageFilenames.length > 0) {
+            imageUrls = imageFilenames.map((filename) => 
+              `http://localhost:5000/uploads/home_page_products/${filename}`
+            );
+          }
+          
+          console.log("Processed imageFilenames:", imageFilenames);
+          console.log("Processed imageUrls:", imageUrls);
+          
+          // Update product data with processed arrays
+          productData.images = imageFilenames;
+          productData.imageUrls = imageUrls;
+          
           setProduct(productData);
+          setImageError(false);
+          setSelectedImageIndex(0); // Reset to first image
           
           // Fetch similar products from same category
           if (productData.category) {
@@ -56,6 +102,7 @@ export default function ProductDescription() {
 
   const fetchSimilarProducts = async (category, excludeId) => {
     try {
+      setLoadingSimilar(true);
       // Use the new similar products API endpoint
       const res = await api.get("/products/similar", {
         params: {
@@ -82,8 +129,12 @@ export default function ProductDescription() {
           case "snacks":
             endpoint = "/products/snacks";
             break;
+          case "mouth_freshners":
+            endpoint = "/products/snacks"; // Fallback to snacks if no specific endpoint
+            break;
           default:
-            return;
+            endpoint = "/products/snacks"; // Default fallback
+            break;
         }
         
         const fallbackRes = await api.get(endpoint);
@@ -95,7 +146,10 @@ export default function ProductDescription() {
         }
       } catch (fallbackErr) {
         console.error("Error in fallback similar products fetch:", fallbackErr);
+        setSimilarProducts([]);
       }
+    } finally {
+      setLoadingSimilar(false);
     }
   };
 
@@ -155,16 +209,40 @@ export default function ProductDescription() {
   
   // Use imageUrls if available (from API), otherwise construct from images array
   const getImageUrl = (imageIndex) => {
-    if (product.imageUrls && product.imageUrls[imageIndex]) {
-      return product.imageUrls[imageIndex];
+    console.log(`Getting image URL for index ${imageIndex}`);
+    console.log("product.imageUrls:", product.imageUrls);
+    console.log("product.images:", product.images);
+    
+    // First try imageUrls array (full URLs from API)
+    if (product.imageUrls && Array.isArray(product.imageUrls) && product.imageUrls.length > imageIndex) {
+      const url = product.imageUrls[imageIndex];
+      console.log(`Using imageUrls[${imageIndex}]:`, url);
+      return url;
     }
-    if (product.images && product.images[imageIndex]) {
-      return `http://localhost:5000/uploads/home_page_products/${product.images[imageIndex]}`;
+    
+    // Fallback to constructing URL from images array (filenames)
+    if (product.images && Array.isArray(product.images) && product.images.length > imageIndex) {
+      const filename = product.images[imageIndex];
+      const url = `http://localhost:5000/uploads/home_page_products/${filename}`;
+      console.log(`Constructing URL from images[${imageIndex}]:`, url);
+      return url;
     }
+    
+    console.log(`No image found for index ${imageIndex}`);
     return null;
   };
   
-  const images = product.images && product.images.length > 0 ? product.images : [];
+  // Get images count - use the length of whichever array exists and has items
+  const imagesCount = (product.imageUrls && Array.isArray(product.imageUrls) && product.imageUrls.length > 0)
+    ? product.imageUrls.length
+    : (product.images && Array.isArray(product.images) && product.images.length > 0
+      ? product.images.length
+      : 0);
+  
+  console.log("Total images count:", imagesCount);
+  
+  // Create array for mapping thumbnails
+  const imagesArray = Array.from({ length: imagesCount }, (_, i) => i);
 
   return (
     <>
@@ -186,32 +264,65 @@ export default function ProductDescription() {
           <div className="product-images-section">
             {/* Main Product Image */}
             <div className="main-product-image">
-              {images.length > 0 && getImageUrl(selectedImageIndex) ? (
-                <img
-                  src={getImageUrl(selectedImageIndex)}
-                  alt={product.name}
-                  className="main-image"
-                />
+              {imagesCount > 0 && !imageError ? (
+                (() => {
+                  const imageUrl = getImageUrl(selectedImageIndex);
+                  console.log(`Rendering main image ${selectedImageIndex}:`, imageUrl);
+                  return imageUrl ? (
+                    <img
+                      key={`main-${selectedImageIndex}-${imageUrl}`}
+                      src={imageUrl}
+                      alt={product.name}
+                      className="main-image"
+                      onLoad={() => {
+                        console.log("Image loaded successfully:", imageUrl);
+                        setImageError(false);
+                      }}
+                      onError={(e) => {
+                        console.error("Image failed to load:", imageUrl);
+                        setImageError(true);
+                      }}
+                    />
+                  ) : (
+                    <div className="no-image-placeholder">No image URL available</div>
+                  );
+                })()
               ) : (
-                <div className="no-image-placeholder">No image available</div>
+                <div className="no-image-placeholder">
+                  {imageError ? "Failed to load image" : "No images found"}
+                </div>
               )}
             </div>
 
             {/* Product Thumbnails */}
-            {images.length > 1 && (
+            {imagesCount > 1 && (
               <div className="product-thumbnails">
-                {images.map((img, index) => (
-                  <div
-                    key={index}
-                    className={`thumbnail ${selectedImageIndex === index ? "active" : ""}`}
-                    onClick={() => setSelectedImageIndex(index)}
-                  >
-                    <img
-                      src={getImageUrl(index)}
-                      alt={`${product.name} ${index + 1}`}
-                    />
-                  </div>
-                ))}
+                {imagesArray.map((_, index) => {
+                  const thumbUrl = getImageUrl(index);
+                  return (
+                    <div
+                      key={index}
+                      className={`thumbnail ${selectedImageIndex === index ? "active" : ""}`}
+                      onClick={() => {
+                        setSelectedImageIndex(index);
+                        setImageError(false); // Reset error when changing image
+                      }}
+                    >
+                      {thumbUrl ? (
+                        <img
+                          src={thumbUrl}
+                          alt={`${product.name} ${index + 1}`}
+                          onError={(e) => {
+                            console.error("Thumbnail failed to load:", thumbUrl);
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="thumbnail-placeholder">No img</div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -239,32 +350,6 @@ export default function ProductDescription() {
                 </div>
               )}
             </div>
-
-            {/* Similar Products Section */}
-            {similarProducts.length > 0 && (
-              <div className="similar-products-section">
-                <h3 className="similar-products-heading">Similar products</h3>
-                <div className="similar-products-grid">
-                  {similarProducts.map((item) => (
-                    <div
-                      key={item.id}
-                      className="similar-product-card"
-                      onClick={() => navigate(`/product/${item.id}`)}
-                    >
-                      {item.imageUrls && item.imageUrls[0] && (
-                        <img
-                          src={item.imageUrls[0]}
-                          alt={item.name}
-                          className="similar-product-image"
-                        />
-                      )}
-                      <p className="similar-product-name">{item.name}</p>
-                      <p className="similar-product-price">₹{item.price}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Column - Product Info */}
@@ -329,6 +414,56 @@ export default function ProductDescription() {
             </div>
           </div>
         </div>
+
+        {/* Similar Products Section - At Bottom */}
+        {product.category && (
+          <div className="similar-products-section-bottom">
+            <h3 className="similar-products-heading">Similar products</h3>
+            {loadingSimilar ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+                Loading similar products...
+              </div>
+            ) : similarProducts.length > 0 ? (
+              <div className="similar-products-grid-bottom">
+                {similarProducts.map((item) => (
+                  <div
+                    key={item.id}
+                    className="similar-product-card-bottom"
+                    onClick={() => navigate(`/product/${item.id}`)}
+                  >
+                    {item.imageUrls && item.imageUrls[0] ? (
+                      <img
+                        src={item.imageUrls[0]}
+                        alt={item.name}
+                        className="similar-product-image-bottom"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="similar-product-image-bottom" style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "#f5f5f5",
+                        color: "#999",
+                        fontSize: "12px"
+                      }}>
+                        No Image
+                      </div>
+                    )}
+                    <p className="similar-product-name-bottom">{item.name}</p>
+                    <p className="similar-product-price-bottom">₹{item.price}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+                No similar products found
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
