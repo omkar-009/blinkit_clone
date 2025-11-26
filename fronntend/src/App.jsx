@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import OrderHistory from "./pages/OrderHistory";
 import ProductDescription from "./components/ProductDescription";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
@@ -27,10 +28,11 @@ function App() {
           />
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/product/:id" element={<ProductDescription />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/product/:id" element={<ProductDescription />} />
           </Routes>
         </Router>
       </CartProvider>

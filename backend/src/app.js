@@ -9,6 +9,7 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/user.routes');
 const homeProducts = require('./routes/homeProducts.routes');
+const orderRoutes = require('./routes/order.routes');
 
 // Middlewares
 app.use(express.json());
@@ -45,8 +46,22 @@ app.get('/', (req, res) => {
 });
 
 // Routes
+console.log('Registering routes...');
 app.use('/api/user', userRoutes);
-app.use('/api/products', homeProducts); 
+console.log('User routes registered at /api/user');
+app.use('/api/products', homeProducts);
+app.use('/api/orders', orderRoutes);
+
+// Debug: Catch-all for unmatched API routes (must be after all routes)
+app.use('/api/*', (req, res) => {
+  console.log('❌ Unmatched API route:', req.method, req.originalUrl);
+  console.log('Available routes: /api/user/*, /api/products/*, /api/orders/*');
+  res.status(404).json({
+    status: 404,
+    success: false,
+    error: `Route ${req.method} ${req.originalUrl} not found`
+  });
+});
 
 app.use(errorHandler);
 

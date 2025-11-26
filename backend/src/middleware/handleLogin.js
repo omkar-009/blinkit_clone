@@ -56,11 +56,19 @@ const handleLogin = async (req, res, next) => {
     // Generate JWT (no expiration)
     const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET);
 
-    // Store raw token in DB
+    // Delete all old tokens for this user before creating new one
+    await pool.query(
+      "DELETE FROM tokens WHERE user_id = ?",
+      [users.user_id]
+    );
+    console.log(`Deleted old tokens for user_id: ${users.user_id}`);
+
+    // Store new token in DB
     await pool.query(
       "INSERT INTO tokens (user_id, username, access_token, created_at) VALUES (?, ?, ?, NOW())",
       [users.user_id, users.username, accessToken]
     );
+    console.log(`New token created for user_id: ${users.user_id}`);
 
     // Set cookie (httpOnly, secure, sameSite)
     res.cookie("Authorization", accessToken, {

@@ -65,27 +65,46 @@ export default function Cart() {
   }, []);
 
   const handlePlaceOrder = async () => {
-    // Fetch latest user data before showing modal
+    // Fetch latest user data and create order
     try {
       setLoadingUser(true);
       const response = await api.get("/user/profile");
+      let currentUserData = userData;
+      
       if (response.data.success) {
-        setUserData(response.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      // Use existing userData or default
-      if (!userData) {
-        setUserData({
+        currentUserData = response.data.data;
+        setUserData(currentUserData);
+      } else if (!currentUserData) {
+        currentUserData = {
           username: "Guest",
           email: "",
           contact_number: "",
           address: "35, College Rd, Krishi Nagar, Nashik",
-        });
+        };
       }
+
+      // Create order in database
+      const orderData = {
+        items: cartItems,
+        itemTotal: totalPrice,
+        deliveryFee: deliveryFee,
+        totalAmount: finalTotal,
+        userData: currentUserData,
+      };
+
+      const orderResponse = await api.post("/orders", orderData);
+      
+      if (orderResponse.data.success) {
+        setShowOrderModal(true);
+        // Order saved successfully
+      } else {
+        throw new Error(orderResponse.data.message || "Failed to create order");
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert(error.response?.data?.message || error.message || "Failed to place order. Please try again.");
     } finally {
       setLoadingUser(false);
-      setShowOrderModal(true);
     }
   };
 

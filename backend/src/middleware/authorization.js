@@ -3,6 +3,10 @@ const pool = require("../config/db");
 
 const Authorization = async (req, res, next) => {
   try {
+    console.log("Authorization middleware called for:", req.method, req.originalUrl);
+    console.log("Headers:", req.headers.authorization ? "Authorization header present" : "No Authorization header");
+    console.log("Cookies:", req.cookies?.Authorization ? "Cookie present" : "No cookie");
+    
     // Extract token from cookie or Authorization header
     let token = null;
 
@@ -10,12 +14,24 @@ const Authorization = async (req, res, next) => {
       token = req.cookies.Authorization;
     } else if (req.headers.authorization) {
       const parts = req.headers.authorization.split(" ");
-      if (parts.length === 2 && parts[0] === "Bearer") token = parts[1];
+      if (parts.length === 2 && parts[0] === "Bearer") {
+        token = parts[1];
+      } else if (parts.length === 1) {
+        // Handle case where token is sent without "Bearer" prefix
+        token = parts[0];
+      }
     }
 
     if (!token) {
-      return res.status(401).json({ error: "Access token required" });
+      console.log("No token found in request");
+      return res.status(401).json({ 
+        status: 401,
+        success: false,
+        error: "Access token required" 
+      });
     }
+    
+    console.log("Token found, verifying...");
 
     // Verify JWT
     let decoded;
@@ -41,8 +57,13 @@ const Authorization = async (req, res, next) => {
         .json({ error: "Token revoked or invalid. Please login again." });
     }
 
-    // Attach user info
-    req.user = decoded;
+    // Attach user info - ensure user_id is set
+    req.user = {
+      ...decoded,
+      user_id: decoded.user_id || decoded.userId,
+    };
+    console.log("Token verified successfully, user_id:", req.user.user_id);
+    console.log("Calling next() to proceed to route handler");
     next();
   } catch (error) {
     console.error("Authorization middleware error:", error);

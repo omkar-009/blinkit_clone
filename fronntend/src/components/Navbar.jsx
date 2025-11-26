@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Search, LogOut, User } from "lucide-react";
+import { ShoppingCart, Search, LogOut, User, History } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import Login from "../components/Login";
@@ -50,6 +50,10 @@ export default function Navbar() {
           <div className="navbar-right">
             {isAuthenticated() ? (
               <>
+                <button className="order-history-btn" onClick={() => navigate("/orders")}>
+                  <History size={18} />
+                  <span>Orders</span>
+                </button>
                 <div className="user-info">
                   <User size={18} />
                   <span className="username">{user?.username || "User"}</span>
