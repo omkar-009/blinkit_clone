@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
-export default function Login({ showLogin, setShowLogin }) {
+export default function Login({ showLogin, setShowLogin, onLoginSuccess }) {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({ identifier: "", password: "" });
@@ -23,7 +23,20 @@ export default function Login({ showLogin, setShowLogin }) {
       if (result.success) {
         toast.success(result.message || "Login successful!");
         setShowLogin(false);
-        navigate("/home");
+        
+        // Check if we need to redirect back to cart
+        const redirectTo = localStorage.getItem("blinkit_redirect_to");
+        if (redirectTo === "cart") {
+          localStorage.removeItem("blinkit_redirect_to");
+          navigate("/cart");
+        } else {
+          navigate("/home");
+        }
+        
+        // Call onLoginSuccess callback if provided
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
       } else {
         setError(result.message || "Invalid credentials");
         toast.error(result.message || "Invalid credentials");

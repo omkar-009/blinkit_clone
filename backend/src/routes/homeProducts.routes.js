@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-const { addProduct, getDairyProducts, getTobaccoProducts, getSnackProducts, getProductById, getSimilarProducts } = require("../controllers/homeProducts.controller");
+const { addProduct, getDairyProducts, getTobaccoProducts, getSnackProducts, getProductById, getSimilarProducts, searchProducts } = require("../controllers/homeProducts.controller");
 
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, "../../uploads/home_page_products");
@@ -34,10 +34,23 @@ const upload = multer({
 // Routes
 router.post("/addproduct", upload.any(), addProduct);
 
+// Specific routes before parameterized routes
 router.get("/dairy", getDairyProducts);
 router.get("/tobacco", getTobaccoProducts);
 router.get("/snacks", getSnackProducts);
-router.get("/getproduct/:id", getProductById);
 router.get("/similar", getSimilarProducts);
+router.get("/search", searchProducts);
+
+// Parameterized routes last
+router.get("/getproduct/:id", getProductById);
+
+// Debug: Log routes when loaded
+console.log("Product routes loaded:");
+console.log("  GET  /api/products/dairy");
+console.log("  GET  /api/products/tobacco");
+console.log("  GET  /api/products/snacks");
+console.log("  GET  /api/products/getproduct/:id");
+console.log("  GET  /api/products/similar");
+console.log("  GET  /api/products/search");
 
 module.exports = router;

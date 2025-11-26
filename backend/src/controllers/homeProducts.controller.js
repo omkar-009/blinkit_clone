@@ -202,6 +202,56 @@ const getProductById = async (req, res, next) => {
   }
 };
 
+// Search products by name
+const searchProducts = async (req, res, next) => {
+  try {
+    console.log("Search endpoint hit!");
+    console.log("Query params:", req.query);
+    const { query } = req.query;
+
+    if (!query || query.trim().length === 0) {
+      console.log("No query provided");
+      return sendResponse(res, 400, false, "Search query is required");
+    }
+
+    console.log("Searching for:", query);
+
+    const searchTerm = `%${query.trim()}%`;
+    const startsWithTerm = `${query.trim()}%`;
+
+    const [rows] = await pool.query(
+      `SELECT id, name, category, quantity, price, images 
+       FROM home_page_products 
+       WHERE name LIKE ? OR category LIKE ?
+       ORDER BY 
+         CASE 
+           WHEN name LIKE ? THEN 1
+           WHEN name LIKE ? THEN 2
+           ELSE 3
+         END,
+         name ASC
+       LIMIT 20`,
+      [
+        searchTerm,
+        searchTerm,
+        startsWithTerm,  // Starts with priority
+        searchTerm,      // Contains priority
+      ]
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 200, true, "No products found", []);
+    }
+
+    const formattedRows = formatImageUrls(req, rows);
+
+    return sendResponse(res, 200, true, "Products found", formattedRows);
+  } catch (error) {
+    console.error("Error searching products:", error);
+    next(error);
+  }
+};
+
 // Get similar products by category (excluding current product)
 const getSimilarProducts = async (req, res, next) => {
   try {
@@ -241,5 +291,6 @@ module.exports = {
   getTobaccoProducts,
   getSnackProducts,
   getProductById,
-  getSimilarProducts
+  getSimilarProducts,
+  searchProducts
 };

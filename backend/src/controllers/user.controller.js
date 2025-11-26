@@ -106,7 +106,70 @@ const registerUser = async (req, res, next) => {
 };
 
 
+  // Update user profile
+const updateUserProfile = async (req, res, next) => {
+  try {
+    const userId = req.user?.user_id;
+    const { username, email, contact_number, address } = req.body;
+
+    if (!userId) {
+      return sendResponse(res, 401, false, "User not authenticated");
+    }
+
+    // Validate required fields
+    if (!username || !email || !contact_number) {
+      return sendResponse(res, 400, false, "Username, email, and contact number are required");
+    }
+
+    // Check if email is already taken by another user
+    const [emailRows] = await pool.query(
+      "SELECT user_id FROM users WHERE email = ? AND user_id != ?",
+      [email, userId]
+    );
+    if (emailRows.length > 0) {
+      return sendResponse(res, 409, false, "Email already in use by another account");
+    }
+
+    // Check if contact number is already taken by another user
+    const [contactRows] = await pool.query(
+      "SELECT user_id FROM users WHERE contact_number = ? AND user_id != ?",
+      [contact_number, userId]
+    );
+    if (contactRows.length > 0) {
+      return sendResponse(res, 409, false, "Contact number already in use by another account");
+    }
+
+    // Update user profile
+    await pool.query(
+      `UPDATE users 
+       SET username = ?, email = ?, contact_number = ?, address = ?
+       WHERE user_id = ?`,
+      [username.trim(), email.trim(), contact_number.trim(), address?.trim() || null, userId]
+    );
+
+    // Fetch updated user
+    const [updatedRows] = await pool.query(
+      "SELECT user_id, username, email, contact_number, address FROM users WHERE user_id = ?",
+      [userId]
+    );
+
+    if (updatedRows.length === 0) {
+      return sendResponse(res, 404, false, "User not found");
+    }
+
+    const updatedUser = updatedRows[0];
+    delete updatedUser.password_hash;
+    delete updatedUser.password;
+
+    return sendResponse(res, 200, true, "Profile updated successfully", updatedUser);
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    next(error);
+  }
+};
+
 module.exports = {
     registerUser,
-    getCurrentUser
+    getCurrentUser,
+    updateUserProfile
 }

@@ -2,13 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import OrderModal from "../components/OrderModal";
+import Login from "../components/Login";
 import api from "../../utils/api";
 import "../App.css";
 
 export default function Cart() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const {
     cartItems,
     increaseQuantity,
@@ -18,6 +21,7 @@ export default function Cart() {
     getTotalPrice,
     clearCart,
   } = useCart();
+  const [showLogin, setShowLogin] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
@@ -65,7 +69,22 @@ export default function Cart() {
   }, []);
 
   const handlePlaceOrder = async () => {
-    // Fetch latest user data and create order
+    // Check if user is authenticated
+    if (!isAuthenticated()) {
+      // Save cart to localStorage before redirecting
+      try {
+        localStorage.setItem("blinkit_cart", JSON.stringify(cartItems));
+        localStorage.setItem("blinkit_redirect_to", "cart");
+        console.log("Cart saved before login redirect");
+      } catch (error) {
+        console.error("Error saving cart:", error);
+      }
+      // Show login modal
+      setShowLogin(true);
+      return;
+    }
+
+    // User is authenticated, proceed with order
     try {
       setLoadingUser(true);
       const response = await api.get("/user/profile");
@@ -102,11 +121,27 @@ export default function Cart() {
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert(error.response?.data?.message || error.message || "Failed to place order. Please try again.");
+      if (error.response?.status === 401) {
+        // Token expired, redirect to login
+        localStorage.setItem("blinkit_cart", JSON.stringify(cartItems));
+        localStorage.setItem("blinkit_redirect_to", "cart");
+        setShowLogin(true);
+      } else {
+        alert(error.response?.data?.message || error.message || "Failed to place order. Please try again.");
+      }
     } finally {
       setLoadingUser(false);
     }
   };
+
+  // Handle login success - restore cart if needed
+  useEffect(() => {
+    if (isAuthenticated() && localStorage.getItem("blinkit_redirect_to") === "cart") {
+      // User logged in, cart is already in localStorage from CartContext
+      localStorage.removeItem("blinkit_redirect_to");
+      setShowLogin(false);
+    }
+  }, [isAuthenticated]);
 
   const handleCloseOrderModal = () => {
     setShowOrderModal(false);
@@ -286,6 +321,16 @@ export default function Cart() {
         }}
         userData={userData}
         loadingUser={loadingUser}
+      />
+
+      {/* Login Modal */}
+      <Login 
+        showLogin={showLogin} 
+        setShowLogin={setShowLogin}
+        onLoginSuccess={() => {
+          setShowLogin(false);
+          // Cart is already saved in localStorage, will be restored automatically
+        }}
       />
     </>
   );

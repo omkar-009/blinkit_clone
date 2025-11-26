@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import CartNotification from "../components/CartNotification";
 import api from "../../utils/api";
@@ -8,7 +8,7 @@ import "../App.css";
 
 export default function Tobacco() {
   const navigate = useNavigate();
-  const { addToCart, notification, hideNotification } = useCart();
+  const { addToCart, increaseQuantity, decreaseQuantity, cartItems, notification, hideNotification } = useCart();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);

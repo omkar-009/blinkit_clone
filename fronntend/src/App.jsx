@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import OrderHistory from "./pages/OrderHistory";
+import Account from "./pages/Account";
+import SearchResults from "./pages/SearchResults";
 import ProductDescription from "./components/ProductDescription";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
@@ -32,6 +34,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/product/:id" element={<ProductDescription />} />
           </Routes>
         </Router>
