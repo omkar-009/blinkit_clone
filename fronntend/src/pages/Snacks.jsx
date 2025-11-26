@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCart } from "../context/CartContext";
 import api from "../../utils/api";
 import "../App.css";
+import { toast } from "react-toastify";
 
-export default function DairyProducts() {
+export default function Snacks() {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,18 +18,24 @@ export default function DairyProducts() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
+    console.log("Fetching snacks products from API...");
     api
       .get("/products/snacks")
       .then((res) => {
+        console.log("API Response:", res.data);
         if (res.data.success) {
-          setProducts(res.data.data);
+          const productsData = res.data.data || [];
+          console.log("Products received:", productsData);
+          setProducts(productsData);
         } else {
-          setError(res.data.message);
+          console.error("API returned error:", res.data.message);
+          setError(res.data.message || "Failed to fetch products");
         }
       })
       .catch((err) => {
         console.error("Error fetching products:", err);
-        setError("Failed to fetch products");
+        console.error("Error details:", err.response?.data || err.message);
+        setError(err.response?.data?.message || err.message || "Failed to fetch products. Please check if the backend server is running.");
       })
       .finally(() => {
         setLoading(false);
@@ -109,9 +118,13 @@ export default function DairyProducts() {
                 style={{ cursor: "pointer" }}
               >
                 <img
-                  src={item.imageUrls[0]}
+                  src={item.imageUrls && item.imageUrls[0] ? item.imageUrls[0] : "/placeholder.png"}
                   alt={item.name}
                   className="product-image"
+                  onError={(e) => {
+                    console.error("Image failed to load:", item.imageUrls?.[0]);
+                    e.target.src = "/placeholder.png";
+                  }}
                 />
                 <p className="product-name">{item.name}</p>
                 <p className="product-weight">{item.quantity}</p>
@@ -121,7 +134,8 @@ export default function DairyProducts() {
                     className="add-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Add to cart logic here
+                      addToCart(item);
+                      toast.success(`${item.name} added to cart!`);
                     }}
                   >
                     ADD

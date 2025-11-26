@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ChevronDown, ChevronUp, Clock, ShoppingCart, Package, ChevronRight } from "lucide-react";
+import { useCart } from "../context/CartContext";
 import Navbar from "./Navbar";
 import api from "../../utils/api";
 import "../App.css";
+import { toast } from "react-toastify";
 
 export default function ProductDescription() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [error, setError] = useState("");
@@ -16,6 +19,9 @@ export default function ProductDescription() {
   const [showDetails, setShowDetails] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+  const similarProductsScrollRef = useRef(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -30,6 +36,7 @@ export default function ProductDescription() {
           
           // Debug: Log the product data to check image structure
           console.log("Product data received:", productData);
+          console.log("Category received:", productData.category);
           console.log("Images (raw):", productData.images);
           console.log("ImageUrls (raw):", productData.imageUrls);
           
@@ -72,17 +79,45 @@ export default function ProductDescription() {
           console.log("Processed imageFilenames:", imageFilenames);
           console.log("Processed imageUrls:", imageUrls);
           
-          // Update product data with processed arrays
-          productData.images = imageFilenames;
-          productData.imageUrls = imageUrls;
+          // Try to infer category from product name if missing
+          let inferredCategory = productData.category;
+          if (!inferredCategory || inferredCategory === null || inferredCategory === '') {
+            const productName = (productData.name || '').toLowerCase();
+            if (productName.includes('milk') || productName.includes('dairy') || productName.includes('cheese') || productName.includes('butter') || productName.includes('curd') || productName.includes('yogurt')) {
+              inferredCategory = 'dairy';
+            } else if (productName.includes('cigarette') || productName.includes('tobacco') || productName.includes('bidi')) {
+              inferredCategory = 'tobacco';
+            } else if (productName.includes('chips') || productName.includes('snack') || productName.includes('biscuit') || productName.includes('namkeen')) {
+              inferredCategory = 'snacks';
+            } else if (productName.includes('mouth') || productName.includes('freshener') || productName.includes('mukhwas')) {
+              inferredCategory = 'mouth_freshners';
+            } else {
+              inferredCategory = 'snacks'; // Default fallback
+            }
+            console.log("Category inferred from product name:", productName, "->", inferredCategory);
+          }
           
-          setProduct(productData);
+          // Update product data with processed arrays - preserve category
+          const updatedProductData = {
+            ...productData,
+            category: inferredCategory, // Use inferred category if original was missing
+            images: imageFilenames,
+            imageUrls: imageUrls,
+          };
+          
+          console.log("Updated product data with category:", updatedProductData.category);
+          
+          setProduct(updatedProductData);
           setImageError(false);
           setSelectedImageIndex(0); // Reset to first image
           
           // Fetch similar products from same category
-          if (productData.category) {
-            fetchSimilarProducts(productData.category, id);
+          if (updatedProductData.category) {
+            console.log("Fetching similar products for category:", updatedProductData.category, "excluding:", id);
+            fetchSimilarProducts(updatedProductData.category, id);
+          } else {
+            console.warn("No category found for product, cannot fetch similar products");
+            console.warn("Product data keys:", Object.keys(updatedProductData));
           }
         } else {
           setError(res.data.message || "Failed to fetch product");
@@ -103,6 +138,8 @@ export default function ProductDescription() {
   const fetchSimilarProducts = async (category, excludeId) => {
     try {
       setLoadingSimilar(true);
+      console.log("Fetching similar products - Category:", category, "ExcludeId:", excludeId);
+      
       // Use the new similar products API endpoint
       const res = await api.get("/products/similar", {
         params: {
@@ -111,11 +148,23 @@ export default function ProductDescription() {
         },
       });
       
+      console.log("Similar products API response:", res.data);
+      
       if (res.data.success && res.data.data) {
+        console.log("Similar products fetched:", res.data.data.length, "products");
         setSimilarProducts(res.data.data);
+        // Check scroll buttons after products are set
+        setTimeout(() => {
+          checkSimilarScrollButtons();
+        }, 100);
+      } else {
+        console.log("No similar products in response");
+        setSimilarProducts([]);
       }
     } catch (err) {
-      console.error("Error fetching similar products:", err);
+      console.error("Error fetching similar products from API:", err);
+      console.error("Error details:", err.response?.data);
+      
       // Fallback to category-based fetch if similar API fails
       try {
         let endpoint = "";
@@ -137,12 +186,22 @@ export default function ProductDescription() {
             break;
         }
         
+        console.log("Trying fallback endpoint:", endpoint);
         const fallbackRes = await api.get(endpoint);
+        console.log("Fallback response:", fallbackRes.data);
+        
         if (fallbackRes.data.success) {
           const filtered = fallbackRes.data.data
-            .filter((p) => p.id !== parseInt(excludeId))
-            .slice(0, 4);
+            .filter((p) => p.id !== parseInt(excludeId));
+          // Remove slice(0, 4) to get all products
+          console.log("Filtered similar products:", filtered.length, "products");
           setSimilarProducts(filtered);
+          // Check scroll buttons after products are set
+          setTimeout(() => {
+            checkSimilarScrollButtons();
+          }, 100);
+        } else {
+          setSimilarProducts([]);
         }
       } catch (fallbackErr) {
         console.error("Error in fallback similar products fetch:", fallbackErr);
@@ -150,6 +209,47 @@ export default function ProductDescription() {
       }
     } finally {
       setLoadingSimilar(false);
+      console.log("Finished fetching similar products. Loading:", false);
+    }
+  };
+
+  // Scroll functions for similar products
+  const scrollSimilarProducts = (direction) => {
+    const { current } = similarProductsScrollRef;
+    if (current) {
+      const scrollAmount = 300;
+      current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+      setTimeout(checkSimilarScrollButtons, 400);
+    }
+  };
+
+  const checkSimilarScrollButtons = () => {
+    const el = similarProductsScrollRef.current;
+    if (!el) return;
+
+    const atStart = el.scrollLeft <= 0;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 5;
+
+    setShowLeftArrow(!atStart);
+    setShowRightArrow(!atEnd);
+  };
+
+  useEffect(() => {
+    const el = similarProductsScrollRef.current;
+    if (el) {
+      el.addEventListener("scroll", checkSimilarScrollButtons);
+      checkSimilarScrollButtons();
+    }
+    return () => el && el.removeEventListener("scroll", checkSimilarScrollButtons);
+  }, [similarProducts]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product);
+      toast.success(`${product.name} added to cart!`);
     }
   };
 
@@ -368,7 +468,9 @@ export default function ProductDescription() {
             </div>
 
             {/* Add to Cart Button */}
-            <button className="add-to-cart-btn">Add to cart</button>
+            <button className="add-to-cart-btn" onClick={handleAddToCart}>
+              Add to cart
+            </button>
 
             {/* Why shop from blinkit */}
             <div className="why-shop-section">
@@ -416,54 +518,127 @@ export default function ProductDescription() {
         </div>
 
         {/* Similar Products Section - At Bottom */}
-        {product.category && (
-          <div className="similar-products-section-bottom">
-            <h3 className="similar-products-heading">Similar products</h3>
-            {loadingSimilar ? (
-              <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-                Loading similar products...
-              </div>
-            ) : similarProducts.length > 0 ? (
-              <div className="similar-products-grid-bottom">
-                {similarProducts.map((item) => (
+        <div className="similar-products-section-bottom">
+          <h3 className="similar-products-heading">Similar products</h3>
+          {(() => {
+            // Debug: Log current state
+            console.log("Render - Product:", product);
+            console.log("Render - Product category:", product?.category);
+            console.log("Render - Loading similar:", loadingSimilar);
+            console.log("Render - Similar products count:", similarProducts.length);
+            
+            if (!product) {
+              return (
+                <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+                  Product not loaded
+                </div>
+              );
+            }
+            
+            const category = product.category;
+            const hasCategory = category && typeof category === 'string' && category.trim() !== '';
+            
+            if (!hasCategory) {
+              return (
+                <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+                  Category not available. Product keys: {Object.keys(product).join(", ")}
+                </div>
+              );
+            }
+            
+            if (loadingSimilar) {
+              return (
+                <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+                  Loading similar products...
+                </div>
+              );
+            }
+            
+            if (similarProducts.length > 0) {
+              return (
+                <div className="slider-wrapper" style={{ position: "relative" }}>
+                  {/* Left Arrow */}
+                  {showLeftArrow && (
+                    <button className="scroll-btn left" onClick={() => scrollSimilarProducts("left")}>
+                      <ChevronLeft size={24} />
+                    </button>
+                  )}
+
+                  {/* Product Cards - Horizontal Scroll */}
                   <div
-                    key={item.id}
-                    className="similar-product-card-bottom"
-                    onClick={() => navigate(`/product/${item.id}`)}
+                    className="product-container"
+                    ref={similarProductsScrollRef}
+                    style={{
+                      display: "flex",
+                      overflowX: "auto",
+                      scrollBehavior: "smooth",
+                      gap: "15px",
+                    }}
                   >
-                    {item.imageUrls && item.imageUrls[0] ? (
-                      <img
-                        src={item.imageUrls[0]}
-                        alt={item.name}
-                        className="similar-product-image-bottom"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="similar-product-image-bottom" style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: "#f5f5f5",
-                        color: "#999",
-                        fontSize: "12px"
-                      }}>
-                        No Image
+                    {similarProducts.map((item) => (
+                      <div
+                        key={item.id}
+                        className="product-card"
+                        onClick={() => navigate(`/product/${item.id}`)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {item.imageUrls && item.imageUrls[0] ? (
+                          <img
+                            src={item.imageUrls[0]}
+                            alt={item.name}
+                            className="product-image"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="product-image" style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "#f5f5f5",
+                            color: "#999",
+                            fontSize: "12px"
+                          }}>
+                            No Image
+                          </div>
+                        )}
+                        <p className="product-name">{item.name}</p>
+                        <p className="product-weight">{item.quantity}</p>
+                        <div className="product-description">
+                          <p className="product-price">₹{item.price}</p>
+                          <button 
+                            className="add-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addToCart(item);
+                              toast.success(`${item.name} added to cart!`);
+                            }}
+                          >
+                            ADD
+                          </button>
+                        </div>
                       </div>
-                    )}
-                    <p className="similar-product-name-bottom">{item.name}</p>
-                    <p className="similar-product-price-bottom">₹{item.price}</p>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : (
+
+                  {/* Right Arrow */}
+                  {showRightArrow && (
+                    <button className="scroll-btn right" onClick={() => scrollSimilarProducts("right")}>
+                      <ChevronRight size={24} />
+                    </button>
+                  )}
+                </div>
+              );
+            }
+            
+            return (
               <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-                No similar products found
+                No similar products found for category: {category}
               </div>
-            )}
-          </div>
-        )}
+            );
+          })()}
+        </div>
       </div>
     </>
   );

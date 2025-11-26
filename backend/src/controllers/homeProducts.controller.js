@@ -157,6 +157,12 @@ const getProductById = async (req, res, next) => {
     }
 
     const product = rows[0];
+    
+    // Debug: Log the raw product data from database
+    console.log("Raw product from database:", product);
+    console.log("Category from database:", product.category);
+    console.log("Category type:", typeof product.category);
+    
     const baseUrl = `${req.protocol}://${req.get("host")}/uploads/home_page_products/`;
     
     // Parse and format images
@@ -174,12 +180,21 @@ const getProductById = async (req, res, next) => {
       }
     }
 
+    // Ensure category is always included, even if NULL
     // Return product with both imageUrls (for display) and images (filenames array for frontend)
     const formattedProduct = {
-      ...product,
+      id: product.id,
+      name: product.name,
+      category: product.category || null, // Explicitly include category, even if NULL
+      quantity: product.quantity,
+      price: product.price,
       images: imageFilenames, // Array of filenames
       imageUrls: imageUrls, // Array of full URLs
+      details: product.details,
     };
+    
+    console.log("Formatted product being sent:", formattedProduct);
+    console.log("Formatted product category:", formattedProduct.category);
 
     return sendResponse(res, 200, true, "Product fetched successfully", formattedProduct);
   } catch (error) {
@@ -204,7 +219,7 @@ const getSimilarProducts = async (req, res, next) => {
       params.push(excludeId);
     }
 
-    query += " LIMIT 4";
+    // Remove LIMIT to get all products in category
 
     const [rows] = await pool.query(query, params);
 

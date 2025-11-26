@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ShoppingCart, Search } from "lucide-react";
+import { useCart } from "../context/CartContext";
 import Login from "../components/Login";
 import "../App.css";
 
 import logo from "../assets/logo.webp";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
+  const { getTotalItems } = useCart();
+  const cartItemCount = getTotalItems(); 
+
   return (
     <>
       {/* Navbar */}
@@ -39,9 +45,12 @@ export default function Navbar() {
               Login
             </button>
 
-            <button className="cart-btn">
+            <button className="cart-btn" onClick={() => navigate("/cart")}>
               <ShoppingCart size={22} className="cart-icon" />
               <span>My Cart</span>
+              {cartItemCount > 0 && (
+                <span className="cart-badge">{cartItemCount}</span>
+              )}
             </button>
           </div>
         </nav>

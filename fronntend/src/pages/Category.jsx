@@ -1,6 +1,5 @@
 import React from "react";
 import "../App.css";
-import "../../utils/api"
 
 import paan from "../assets/paan.avif";
 import dairy from "../assets/dairy.avif";
