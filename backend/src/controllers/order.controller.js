@@ -186,7 +186,7 @@ const cancelOrder = async (req, res, next) => {
       return sendResponse(res, 400, false, "Cannot cancel delivered order");
     }
 
-    // Calculate cancellation fee (50 rupees)
+    // Calculate cancellation
     const cancellationFee = 50;
     const refundAmount = order.total_amount - cancellationFee;
 

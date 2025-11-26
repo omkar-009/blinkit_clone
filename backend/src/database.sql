@@ -10,9 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Add address column if it doesn't exist (for existing databases)
-ALTER TABLE users ADD COLUMN IF NOT EXISTS address VARCHAR(255);
-
 -- Create the tokens table
 SET SESSION sql_mode = '';
 CREATE TABLE tokens (
@@ -76,4 +73,3 @@ CREATE TABLE IF NOT EXISTS order_items (
     INDEX idx_order_items_product_id (product_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Note: Indexes are now created inline with table creation for better compatibility

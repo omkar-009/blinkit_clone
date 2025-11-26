@@ -180,16 +180,15 @@ const getProductById = async (req, res, next) => {
       }
     }
 
-    // Ensure category is always included, even if NULL
     // Return product with both imageUrls (for display) and images (filenames array for frontend)
     const formattedProduct = {
       id: product.id,
       name: product.name,
-      category: product.category || null, // Explicitly include category, even if NULL
+      category: product.category || null,
       quantity: product.quantity,
       price: product.price,
-      images: imageFilenames, // Array of filenames
-      imageUrls: imageUrls, // Array of full URLs
+      images: imageFilenames,
+      imageUrls: imageUrls,
       details: product.details,
     };
     

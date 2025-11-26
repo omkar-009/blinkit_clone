@@ -3,10 +3,6 @@ const pool = require("../config/db");
 
 const Authorization = async (req, res, next) => {
   try {
-    console.log("Authorization middleware called for:", req.method, req.originalUrl);
-    console.log("Headers:", req.headers.authorization ? "Authorization header present" : "No Authorization header");
-    console.log("Cookies:", req.cookies?.Authorization ? "Cookie present" : "No cookie");
-    
     // Extract token from cookie or Authorization header
     let token = null;
 
@@ -30,8 +26,6 @@ const Authorization = async (req, res, next) => {
         error: "Access token required" 
       });
     }
-    
-    console.log("Token found, verifying...");
 
     // Verify JWT
     let decoded;
@@ -62,11 +56,8 @@ const Authorization = async (req, res, next) => {
       ...decoded,
       user_id: decoded.user_id || decoded.userId,
     };
-    console.log("Token verified successfully, user_id:", req.user.user_id);
-    console.log("Calling next() to proceed to route handler");
     next();
   } catch (error) {
-    console.error("Authorization middleware error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
