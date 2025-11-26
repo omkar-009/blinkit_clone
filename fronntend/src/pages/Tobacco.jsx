@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import api from "../../utils/api";
 import "../App.css";
 
 export default function DairyProducts() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -100,7 +102,12 @@ export default function DairyProducts() {
             </p>
           ) : products.length > 0 ? (
             products.map((item) => (
-              <div className="product-card" key={item.id}>
+              <div 
+                className="product-card" 
+                key={item.id}
+                onClick={() => navigate(`/product/${item.id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <img
                   src={item.imageUrls[0]}
                   alt={item.name}
@@ -110,7 +117,15 @@ export default function DairyProducts() {
                 <p className="product-weight">{item.quantity}</p>
                 <div className="product-description">
                   <p className="product-price">₹{item.price}</p>
-                  <button className="add-btn">ADD</button>
+                  <button 
+                    className="add-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Add to cart logic here
+                    }}
+                  >
+                    ADD
+                  </button>
                 </div>
               </div>
             ))

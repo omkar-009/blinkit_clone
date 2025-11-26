@@ -148,7 +148,7 @@ const getProductById = async (req, res, next) => {
     const { id } = req.params;
 
     const [rows] = await pool.query(
-      "SELECT id, name, quantity, price, images, details FROM home_page_products WHERE id = ?",
+      "SELECT id, name, category, quantity, price, images, details FROM home_page_products WHERE id = ?",
       [id]
     );
 
@@ -156,7 +156,65 @@ const getProductById = async (req, res, next) => {
       return sendResponse(res, 404, false, "Product not found");
     }
 
-    return sendResponse(res, 200, true, "Product fetched successfully", rows[0]);
+    const product = rows[0];
+    const baseUrl = `${req.protocol}://${req.get("host")}/uploads/home_page_products/`;
+    
+    // Parse and format images
+    let imageUrls = [];
+    let imageFilenames = [];
+    
+    if (product.images) {
+      try {
+        imageFilenames = JSON.parse(product.images);
+        imageUrls = imageFilenames.map((filename) => `${baseUrl}${filename}`);
+      } catch (e) {
+        console.error("Failed to parse images:", e);
+        imageFilenames = [];
+        imageUrls = [];
+      }
+    }
+
+    // Return product with both imageUrls (for display) and images (filenames array for frontend)
+    const formattedProduct = {
+      ...product,
+      images: imageFilenames, // Array of filenames
+      imageUrls: imageUrls, // Array of full URLs
+    };
+
+    return sendResponse(res, 200, true, "Product fetched successfully", formattedProduct);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get similar products by category (excluding current product)
+const getSimilarProducts = async (req, res, next) => {
+  try {
+    const { category, excludeId } = req.query;
+
+    if (!category) {
+      return sendResponse(res, 400, false, "Category is required");
+    }
+
+    let query = "SELECT id, name, quantity, price, images FROM home_page_products WHERE category = ?";
+    const params = [category];
+
+    if (excludeId) {
+      query += " AND id != ?";
+      params.push(excludeId);
+    }
+
+    query += " LIMIT 4";
+
+    const [rows] = await pool.query(query, params);
+
+    if (rows.length === 0) {
+      return sendResponse(res, 200, true, "No similar products found", []);
+    }
+
+    const formattedRows = formatImageUrls(req, rows);
+
+    return sendResponse(res, 200, true, "Similar products fetched successfully", formattedRows);
   } catch (error) {
     next(error);
   }
@@ -167,5 +225,6 @@ module.exports = {
   getDairyProducts,
   getTobaccoProducts,
   getSnackProducts,
-  getProductById
+  getProductById,
+  getSimilarProducts
 };

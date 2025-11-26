@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-const { addProduct, getDairyProducts, getTobaccoProducts, getSnackProducts, getProductById  } = require("../controllers/homeProducts.controller");
+const { addProduct, getDairyProducts, getTobaccoProducts, getSnackProducts, getProductById, getSimilarProducts } = require("../controllers/homeProducts.controller");
 
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, "../../uploads/home_page_products");
@@ -38,5 +38,6 @@ router.get("/dairy", getDairyProducts);
 router.get("/tobacco", getTobaccoProducts);
 router.get("/snacks", getSnackProducts);
 router.get("/getproduct/:id", getProductById);
+router.get("/similar", getSimilarProducts);
 
 module.exports = router;

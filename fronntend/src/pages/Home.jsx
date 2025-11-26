@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import Login from "../components/Login";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import Categories from "./Category";
 import DairyProducts from "./DairyProducts";
 import TobaccoProducts from "./Tobacco";
@@ -46,6 +47,9 @@ export default function Home() {
 
       {/* Snacks Products Section */}
       <SnacksProducts />
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 }
