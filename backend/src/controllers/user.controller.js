@@ -2,6 +2,36 @@ const bcrypt = require("bcrypt");
 const pool = require("../config/db");
 const { sendResponse } = require("../utils/response");
 
+// Get current user profile
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const userId = req.user?.user_id;
+
+    if (!userId) {
+      return sendResponse(res, 401, false, "User not authenticated");
+    }
+
+    // Fetch user from database
+    const [rows] = await pool.query(
+      "SELECT user_id, username, email, contact_number, address FROM users WHERE user_id = ?",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "User not found");
+    }
+
+    const user = rows[0];
+    // Remove sensitive data
+    delete user.password_hash;
+    delete user.password;
+
+    return sendResponse(res, 200, true, "User fetched successfully", user);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const registerUser = async (req, res, next) => {
     try {
         const { username, email, contact_no, password } = req.body;
@@ -32,7 +62,7 @@ const registerUser = async (req, res, next) => {
 
         // Check if contact number already exists
         const [contactRows] = await pool.query(
-        "SELECT * FROM users WHERE contact_no = ?",
+        "SELECT * FROM users WHERE contact_number = ?",
         [contact_no]
         );
         if (contactRows.length > 0) {
@@ -50,7 +80,7 @@ const registerUser = async (req, res, next) => {
         // Insert user into database
         const [result] = await pool.query(
         `INSERT INTO users 
-                (username, email, contact_no, password_hash, raw_password, created_at)
+                (username, email, contact_number, password_hash, password, created_at)
                 VALUES (?, ?, ?, ?, ?, NOW())`,
         [
             username.trim(),
@@ -75,5 +105,6 @@ const registerUser = async (req, res, next) => {
 
 
 module.exports = {
-    registerUser
+    registerUser,
+    getCurrentUser
 }

@@ -4,10 +4,14 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     contact_number VARCHAR(15),
+    address VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
     password VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add address column if it doesn't exist (for existing databases)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS address VARCHAR(255);
 
 -- Create the tokens table
 SET SESSION sql_mode = '';

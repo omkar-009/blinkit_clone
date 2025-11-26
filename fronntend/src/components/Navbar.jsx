@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Search } from "lucide-react";
+import { ShoppingCart, Search, LogOut, User } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import Login from "../components/Login";
 import "../App.css";
 
@@ -11,7 +12,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
   const { getTotalItems } = useCart();
-  const cartItemCount = getTotalItems(); 
+  const { user, isAuthenticated, logout } = useAuth();
+  const cartItemCount = getTotalItems();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/home");
+  }; 
 
   return (
     <>
@@ -41,9 +48,22 @@ export default function Navbar() {
 
           {/* Login & Cart */}
           <div className="navbar-right">
-            <button className="login-btn" onClick={() => setShowLogin(true)}>
-              Login
-            </button>
+            {isAuthenticated() ? (
+              <>
+                <div className="user-info">
+                  <User size={18} />
+                  <span className="username">{user?.username || "User"}</span>
+                </div>
+                <button className="logout-btn" onClick={handleLogout}>
+                  <LogOut size={18} />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <button className="login-btn" onClick={() => setShowLogin(true)}>
+                Login
+              </button>
+            )}
 
             <button className="cart-btn" onClick={() => navigate("/cart")}>
               <ShoppingCart size={22} className="cart-icon" />

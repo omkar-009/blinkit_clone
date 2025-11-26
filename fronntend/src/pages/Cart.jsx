@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import Navbar from "../components/Navbar";
+import OrderModal from "../components/OrderModal";
+import api from "../../utils/api";
 import "../App.css";
-import { toast } from "react-toastify";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -17,25 +18,81 @@ export default function Cart() {
     getTotalPrice,
     clearCart,
   } = useCart();
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false);
 
   const handleIncrease = (productId) => {
     increaseQuantity(productId);
-    toast.success("Quantity increased");
   };
 
   const handleDecrease = (productId, currentQuantity) => {
     if (currentQuantity <= 1) {
       removeFromCart(productId);
-      toast.success("Item removed from cart");
     } else {
       decreaseQuantity(productId);
-      toast.success("Quantity decreased");
     }
   };
 
-  const handleRemove = (productId, productName) => {
+  const handleRemove = (productId) => {
     removeFromCart(productId);
-    toast.success(`${productName} removed from cart`);
+  };
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoadingUser(true);
+        const response = await api.get("/user/profile");
+        if (response.data.success) {
+          setUserData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // User might not be logged in, set default values
+        setUserData({
+          username: "Guest",
+          email: "",
+          contact_number: "",
+          address: "35, College Rd, Krishi Nagar, Nashik",
+        });
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handlePlaceOrder = async () => {
+    // Fetch latest user data before showing modal
+    try {
+      setLoadingUser(true);
+      const response = await api.get("/user/profile");
+      if (response.data.success) {
+        setUserData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      // Use existing userData or default
+      if (!userData) {
+        setUserData({
+          username: "Guest",
+          email: "",
+          contact_number: "",
+          address: "35, College Rd, Krishi Nagar, Nashik",
+        });
+      }
+    } finally {
+      setLoadingUser(false);
+      setShowOrderModal(true);
+    }
+  };
+
+  const handleCloseOrderModal = () => {
+    setShowOrderModal(false);
+    clearCart(); // Clear cart when modal is closed
+    navigate("/home");
   };
 
   const getImageUrl = (item) => {
@@ -146,7 +203,7 @@ export default function Cart() {
                           <p className="item-total-price">₹{itemTotal.toFixed(2)}</p>
                           <button
                             className="remove-item-btn"
-                            onClick={() => handleRemove(item.id, item.name)}
+                            onClick={() => handleRemove(item.id)}
                             title="Remove item"
                           >
                             <Trash2 size={18} />
@@ -179,7 +236,7 @@ export default function Cart() {
                       <span className="total-price">₹{finalTotal.toFixed(2)}</span>
                     </div>
 
-                    <button className="place-order-btn">
+                    <button className="place-order-btn" onClick={handlePlaceOrder}>
                       Place Order
                     </button>
 
@@ -197,6 +254,20 @@ export default function Cart() {
             )}
         </div>
       </div>
+
+      {/* Order Modal */}
+      <OrderModal
+        isOpen={showOrderModal}
+        onClose={handleCloseOrderModal}
+        orderSummary={{
+          itemTotal: totalPrice,
+          deliveryFee: deliveryFee,
+          total: finalTotal,
+          itemCount: totalItems,
+        }}
+        userData={userData}
+        loadingUser={loadingUser}
+      />
     </>
   );
 }

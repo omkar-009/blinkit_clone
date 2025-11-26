@@ -24,7 +24,7 @@ const handleLogin = async (req, res, next) => {
 
     // Fetch user
     const query = contact_no
-      ? "SELECT * FROM users WHERE contact_no = ?"
+      ? "SELECT * FROM users WHERE contact_number = ?"
       : "SELECT * FROM users WHERE email = ?";
     const value = contact_no || email;
 
@@ -49,7 +49,7 @@ const handleLogin = async (req, res, next) => {
       user_id: users.user_id,
       user_name: users.username,
       email: users.email,
-      contact_no: users.contact_no,
+      contact_no: users.contact_number,
       created_at: users.created_at
     };
 
@@ -77,7 +77,7 @@ const handleLogin = async (req, res, next) => {
       accessToken
     });
  
-    console.log(`User logged in: ${users.email || users.contact_no}`);
+    console.log(`User logged in: ${users.email || users.contact_number}`);
   } catch (error) {
     next(error);
   }

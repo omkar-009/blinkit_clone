@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import CartNotification from "../components/CartNotification";
 import api from "../../utils/api";
 import "../App.css";
-import { toast } from "react-toastify";
 
 export default function Tobacco() {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, notification, hideNotification } = useCart();
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -135,7 +135,6 @@ export default function Tobacco() {
                     onClick={(e) => {
                       e.stopPropagation();
                       addToCart(item);
-                      toast.success(`${item.name} added to cart!`);
                     }}
                   >
                     ADD
@@ -155,6 +154,13 @@ export default function Tobacco() {
           </button>
         )}
       </div>
+
+      {/* Cart Notification */}
+      <CartNotification
+        message={notification.message}
+        show={notification.show}
+        onClose={hideNotification}
+      />
     </div>
   );
 }

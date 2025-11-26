@@ -12,6 +12,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [notification, setNotification] = useState({ show: false, message: "" });
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -38,6 +39,16 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems]);
 
+  // Show notification
+  const showNotification = (message) => {
+    setNotification({ show: true, message });
+  };
+
+  // Hide notification
+  const hideNotification = () => {
+    setNotification({ show: false, message: "" });
+  };
+
   // Add item to cart
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -61,6 +72,8 @@ export const CartProvider = ({ children }) => {
         ];
       }
     });
+    // Notification disabled - don't show toast/notification
+    // showNotification("Product added to cart");
   };
 
   // Remove item from cart
@@ -138,6 +151,8 @@ export const CartProvider = ({ children }) => {
     clearCart,
     getTotalItems,
     getTotalPrice,
+    notification,
+    hideNotification,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -3,14 +3,14 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ChevronDown, ChevronUp, Clock, ShoppingCart, Package, ChevronRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import Navbar from "./Navbar";
+import CartNotification from "./CartNotification";
 import api from "../../utils/api";
 import "../App.css";
-import { toast } from "react-toastify";
 
 export default function ProductDescription() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, notification, hideNotification } = useCart();
   const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [error, setError] = useState("");
@@ -63,7 +63,7 @@ export default function ProductDescription() {
             } else if (typeof productData.imageUrls === 'string') {
               try {
                 imageUrls = JSON.parse(productData.imageUrls);
-              } catch (e) {
+            } catch (e) {
                 imageUrls = [];
               }
             }
@@ -131,7 +131,7 @@ export default function ProductDescription() {
     };
 
     if (id) {
-      fetchProduct();
+    fetchProduct();
     }
   }, [id]);
 
@@ -249,7 +249,6 @@ export default function ProductDescription() {
   const handleAddToCart = () => {
     if (product) {
       addToCart(product);
-      toast.success(`${product.name} added to cart!`);
     }
   };
 
@@ -372,7 +371,7 @@ export default function ProductDescription() {
                     <img
                       key={`main-${selectedImageIndex}-${imageUrl}`}
                       src={imageUrl}
-                      alt={product.name}
+                alt={product.name}
                       className="main-image"
                       onLoad={() => {
                         console.log("Image loaded successfully:", imageUrl);
@@ -391,8 +390,8 @@ export default function ProductDescription() {
                 <div className="no-image-placeholder">
                   {imageError ? "Failed to load image" : "No images found"}
                 </div>
-              )}
-            </div>
+          )}
+        </div>
 
             {/* Product Thumbnails */}
             {imagesCount > 1 && (
@@ -612,7 +611,6 @@ export default function ProductDescription() {
                             onClick={(e) => {
                               e.stopPropagation();
                               addToCart(item);
-                              toast.success(`${item.name} added to cart!`);
                             }}
                           >
                             ADD
@@ -620,7 +618,7 @@ export default function ProductDescription() {
                         </div>
                       </div>
                     ))}
-                  </div>
+      </div>
 
                   {/* Right Arrow */}
                   {showRightArrow && (
@@ -640,6 +638,13 @@ export default function ProductDescription() {
           })()}
         </div>
       </div>
+
+      {/* Cart Notification */}
+      <CartNotification
+        message={notification.message}
+        show={notification.show}
+        onClose={hideNotification}
+      />
     </>
   );
 }

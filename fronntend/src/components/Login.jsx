@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 export default function Login({ showLogin, setShowLogin }) {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -18,16 +19,19 @@ export default function Login({ showLogin, setShowLogin }) {
     setError("");
 
     try {
-      const res = await api.post("/user/login", formData, { withCredentials: true });
-      if (res.data.success) {
-        toast.success("Login successful!");
+      const result = await login(formData);
+      if (result.success) {
+        toast.success(result.message || "Login successful!");
         setShowLogin(false);
-        navigate("/");
+        navigate("/home");
       } else {
-        toast.error(res.data.message || "Invalid credentials");
+        setError(result.message || "Invalid credentials");
+        toast.error(result.message || "Invalid credentials");
       }
     } catch (err) {
-        toast.error(err.response?.data?.message || "Login failed");
+      const errorMsg = err.response?.data?.message || err.message || "Login failed";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
