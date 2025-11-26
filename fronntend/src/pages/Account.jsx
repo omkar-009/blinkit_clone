@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, Clock } from "lucide-react";
+import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, Clock, LogOut, History } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import api from "../../utils/api";
@@ -8,7 +8,7 @@ import "../App.css";
 
 export default function Account() {
   const navigate = useNavigate();
-  const { user: authUser, isAuthenticated } = useAuth();
+  const { user: authUser, isAuthenticated, logout } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -101,6 +101,11 @@ export default function Account() {
     });
     setEditing(false);
     setError("");
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/home");
   };
 
   const formatDate = (dateString) => {
@@ -244,7 +249,8 @@ export default function Account() {
             <div className="section-header">
               <h2 className="section-title">Order History</h2>
               <button className="view-all-btn" onClick={() => navigate("/orders")}>
-                View All
+                <History size={18} />
+                <span>View All</span>
               </button>
             </div>
 
@@ -292,6 +298,14 @@ export default function Account() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Logout Section */}
+          <div className="account-section">
+            <button className="logout-account-btn" onClick={handleLogout}>
+              <LogOut size={20} />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>

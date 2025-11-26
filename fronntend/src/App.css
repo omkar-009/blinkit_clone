@@ -470,24 +470,87 @@
 
 /* Add Button */
 .add-btn {
-  border: 1px solid #22c55e;
-  color: #22c55e;
+  border: 1px solid #09943c;
+  color: #09943c;
   background: none;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 6px;
   padding: 5px 16px;
   margin-top: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 28px;
+  font-size: 13px;
 }
 
 .product-description {
   display: inline-flex;
-
 }
 
 .add-btn:hover {
-  background-color: #e9fce9;
+  background-color: #09943c;
+  color: white;
+}
+
+.quantity-controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  background: #09943c;
+  border-radius: 6px;
+  padding: 5px 8px;
+  box-sizing: border-box;
+  width: 60px;
+  height: 28px;
+}
+
+.qty-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.qty-btn svg {
+  stroke-width: 3;
+  font-weight: bold;
+}
+
+.minus-btn {
+  padding-left: 4px;
+}
+
+.plus-btn {
+  padding-right: 4px;
+}
+
+.qty-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.qty-count {
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 16px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 /* Loading text */

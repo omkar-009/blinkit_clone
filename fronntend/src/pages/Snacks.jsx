@@ -130,15 +130,48 @@ export default function Snacks() {
                 <p className="product-weight">{item.quantity}</p>
                 <div className="product-description">
                   <p className="product-price">₹{item.price}</p>
-                  <button 
-                    className="add-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCart(item);
-                    }}
-                  >
-                    ADD
-                  </button>
+                  {(() => {
+                    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+                    const quantity = cartItem?.cartQuantity || 0;
+                    
+                    if (quantity > 0) {
+                      return (
+                        <div className="quantity-controls">
+                          <button
+                            className="qty-btn minus-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              decreaseQuantity(item.id);
+                            }}
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <span className="qty-count">{quantity}</span>
+                          <button
+                            className="qty-btn plus-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              increaseQuantity(item.id);
+                            }}
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <button 
+                          className="add-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(item);
+                          }}
+                        >
+                          ADD
+                        </button>
+                      );
+                    }
+                  })()}
                 </div>
               </div>
             ))

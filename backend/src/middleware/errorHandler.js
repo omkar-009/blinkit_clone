@@ -1,4 +1,4 @@
-const sendResponse = require("../utils/response");
+const { sendResponse } = require("../utils/response");
 
 const errorHandler = (err, req, res, next) => {
   if (res.headersSent) {
@@ -7,7 +7,10 @@ const errorHandler = (err, req, res, next) => {
   }
 
   console.error("Error:", err);
-  sendResponse(res, 500, false, "Internal server error");
+  console.error("Error stack:", err.stack);
+  
+  // Send error response
+  return sendResponse(res, 500, false, err.message || "Internal server error", null);
 };
 
 module.exports = errorHandler;

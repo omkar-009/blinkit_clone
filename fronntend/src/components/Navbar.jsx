@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Search, LogOut, User, History, UserCircle, X } from "lucide-react";
+import { ShoppingCart, Search, UserCircle, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import Login from "../components/Login";
@@ -19,14 +19,9 @@ export default function Navbar() {
   const searchRef = useRef(null);
   const resultsRef = useRef(null);
   const { getTotalItems, getTotalPrice } = useCart();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const cartItemCount = getTotalItems();
   const cartTotalPrice = getTotalPrice();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/home");
-  };
 
   // Real-time search as user types
   useEffect(() => {
@@ -222,32 +217,14 @@ export default function Navbar() {
           {/* Login & Cart */}
           <div className="navbar-right">
             {isAuthenticated() ? (
-              <>
-                <button 
-                  className="account-btn" 
-                  onClick={() => navigate("/account")}
-                  title="My Account"
-                >
-                  <UserCircle size={20} />
-                  <span>Account</span>
-                </button>
-                <button 
-                  className="order-history-btn" 
-                  onClick={() => navigate("/orders")}
-                  title="Order History"
-                >
-                  <History size={18} />
-                  <span>Orders</span>
-                </button>
-                <button 
-                  className="logout-btn" 
-                  onClick={handleLogout}
-                  title="Logout"
-                >
-                  <LogOut size={18} />
-                  <span>Logout</span>
-                </button>
-              </>
+              <button 
+                className="account-btn" 
+                onClick={() => navigate("/account")}
+                title="My Account"
+              >
+                <UserCircle size={20} />
+                <span>Account</span>
+              </button>
             ) : (
               <button className="login-btn" onClick={() => setShowLogin(true)}>
                 Login

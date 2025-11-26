@@ -13,11 +13,37 @@ const getCurrentUser = async (req, res, next) => {
       return sendResponse(res, 401, false, "User not authenticated");
     }
 
+    // Check if contact_number column exists, if not use contact_no
+    let contactColumn = 'contact_number';
+    try {
+      const [colCheck] = await pool.query(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'contact_number'"
+      );
+      if (colCheck.length === 0) {
+        // Check if contact_no exists instead
+        const [colCheck2] = await pool.query(
+          "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'contact_no'"
+        );
+        if (colCheck2.length > 0) {
+          contactColumn = 'contact_no';
+        } else {
+          // Neither exists, add contact_number
+          await pool.query("ALTER TABLE users ADD COLUMN contact_number VARCHAR(15)");
+        }
+      }
+    } catch (e) {
+      console.log("Column check error:", e.message);
+    }
+
     // Fetch user from database
     const [rows] = await pool.query(
-      "SELECT user_id, username, email, contact_number, address FROM users WHERE user_id = ?",
+      `SELECT user_id, username, email, ${contactColumn} as contact_number, address FROM users WHERE user_id = ?`,
       [userId]
     );
+    
+    if (rows.length === 0) {
+      return sendResponse(res, 404, false, "User not found");
+    }
 
     if (rows.length === 0) {
       return sendResponse(res, 404, false, "User not found");
