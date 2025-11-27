@@ -34,7 +34,7 @@ export default function CancelOrderModal({ isOpen, onClose, onConfirm, orderId, 
                 <li>A cancellation fee of <strong>₹{cancellationFee}</strong> will be charged.</li>
                 <li>The remaining amount will be refunded to your account.</li>
                 <li>This action cannot be undone.</li>
-                <li>Refund will be processed within 5-7 business days.</li>
+                <li>Refund will be processed within 24 hrs.</li>
               </ul>
             </div>
           </div>
