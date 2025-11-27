@@ -44,13 +44,4 @@ router.get("/search", searchProducts);
 // Parameterized routes last
 router.get("/getproduct/:id", getProductById);
 
-// Debug: Log routes when loaded
-console.log("Product routes loaded:");
-console.log("  GET  /api/products/dairy");
-console.log("  GET  /api/products/tobacco");
-console.log("  GET  /api/products/snacks");
-console.log("  GET  /api/products/getproduct/:id");
-console.log("  GET  /api/products/similar");
-console.log("  GET  /api/products/search");
-
 module.exports = router;
