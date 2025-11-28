@@ -93,7 +93,7 @@ export default function Footer() {
             <div className="download-section">
               <span className="download-text">Download App</span>
               <div className="app-buttons">
-                <a href="#" className="app-store-btn">
+                <a href="https://apps.apple.com/in/app/blinkit-grocery-in-10-minutes/id960335206" className="app-store-btn" target="_blank">
                   <svg width="20" height="24" viewBox="0 0 20 24" fill="currentColor">
                     <path d="M10 0L0 4v16l10 4 10-4V4L10 0zm0 2.4l7.2 2.88v13.44L10 21.6V2.4z"/>
                   </svg>
@@ -102,7 +102,7 @@ export default function Footer() {
                     <span className="app-btn-large">App Store</span>
                   </div>
                 </a>
-                <a href="#" className="app-store-btn">
+                <a href="https://play.google.com/store/apps/details?id=com.grofers.customerapp&hl=en_IN&gl=US&pli=1" className="app-store-btn" target="_blank">
                   <svg width="20" height="24" viewBox="0 0 20 24" fill="currentColor">
                     <path d="M10 0L0 4v16l10 4 10-4V4L10 0zm0 2.4l7.2 2.88v13.44L10 21.6V2.4z"/>
                   </svg>
@@ -116,16 +116,16 @@ export default function Footer() {
 
             {/* Social Media Icons */}
             <div className="social-icons">
-              <a href="#" className="social-icon" aria-label="Facebook">
+              <a href="https://www.facebook.com/blinkit.india/" className="social-icon" aria-label="Facebook" target="_blank">
                 <Facebook size={18} />
               </a>
-              <a href="#" className="social-icon" aria-label="Twitter">
+              <a href="https://x.com/letsblinkit/" className="social-icon" aria-label="Twitter" target="_blank">
                 <Twitter size={18} />
               </a>
-              <a href="#" className="social-icon" aria-label="Instagram">
+              <a href="https://www.instagram.com/letsblinkit/" className="social-icon" aria-label="Instagram" target="_blank">
                 <Instagram size={18} />
               </a>
-              <a href="#" className="social-icon" aria-label="LinkedIn">
+              <a href="https://in.linkedin.com/company/letsblinkit" className="social-icon" aria-label="LinkedIn" target="_blank">
                 <Linkedin size={18} />
               </a>
               <a href="#" className="social-icon" aria-label="Email">

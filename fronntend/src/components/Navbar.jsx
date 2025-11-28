@@ -22,6 +22,33 @@ export default function Navbar() {
   const { user, isAuthenticated } = useAuth();
   const cartItemCount = getTotalItems();
   const cartTotalPrice = getTotalPrice();
+  const [userData, setUserData] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+
+  // fetch user address
+  useEffect(() => {
+    const fetchUserData = async() => {
+      try {
+        setLoadingUser(true);
+        const response = await api.get("/user/profile");
+        if (response.data.success) {
+          setUserData(response.data.data);
+        } 
+      } catch (error) {
+        setUserData({
+          username: "Guest",
+          email: "",
+          contact_number: "",
+          address: "India",
+        })
+      }
+      finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Real-time search as user types
   useEffect(() => {
@@ -114,7 +141,11 @@ export default function Navbar() {
             <img src={logo} alt="Blinkit Logo" className="logo" />
             <div className="delivery-info">
               <h5>Delivery in 16 minutes</h5>
-              <p>35, College Rd, Krishi Nagar, Nashik</p>
+              <p>
+                {loadingUser
+                  ? "Loading address..."
+                  : userData?.address || "No address found"}
+              </p>
             </div>
           </div>
 
@@ -124,7 +155,7 @@ export default function Navbar() {
               <Search size={18} className="search-icon" />
               <input
                 type="text"
-                placeholder='Search "paneer"'
+                placeholder="Search here"
                 className="search-input"
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -154,11 +185,18 @@ export default function Navbar() {
                 ) : searchResults.length > 0 ? (
                   <>
                     <div className="search-results-header">
-                      <span>{searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found</span>
+                      <span>
+                        {searchResults.length} result
+                        {searchResults.length !== 1 ? "s" : ""} found
+                      </span>
                       <button
                         className="view-all-results-btn"
                         onClick={() => {
-                          navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                          navigate(
+                            `/search?q=${encodeURIComponent(
+                              searchQuery.trim()
+                            )}`
+                          );
                           setShowResults(false);
                         }}
                       >
@@ -186,9 +224,15 @@ export default function Navbar() {
                             />
                           </div>
                           <div className="search-result-details">
-                            <h4 className="search-result-name">{product.name}</h4>
-                            <p className="search-result-quantity">{product.quantity}</p>
-                            <p className="search-result-price">₹{product.price}</p>
+                            <h4 className="search-result-name">
+                              {product.name}
+                            </h4>
+                            <p className="search-result-quantity">
+                              {product.quantity}
+                            </p>
+                            <p className="search-result-price">
+                              ₹{product.price}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -196,7 +240,11 @@ export default function Navbar() {
                         <div
                           className="search-result-item view-more-item"
                           onClick={() => {
-                            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                            navigate(
+                              `/search?q=${encodeURIComponent(
+                                searchQuery.trim()
+                              )}`
+                            );
                             setShowResults(false);
                           }}
                         >
@@ -217,8 +265,8 @@ export default function Navbar() {
           {/* Login & Cart */}
           <div className="navbar-right">
             {isAuthenticated() ? (
-              <button 
-                className="account-btn" 
+              <button
+                className="account-btn"
                 onClick={() => navigate("/account")}
                 title="My Account"
               >
@@ -231,15 +279,21 @@ export default function Navbar() {
               </button>
             )}
 
-            <button 
-              className={`cart-btn ${cartItemCount > 0 ? 'cart-btn-filled' : ''}`} 
+            <button
+              className={`cart-btn ${
+                cartItemCount > 0 ? "cart-btn-filled" : ""
+              }`}
               onClick={() => navigate("/cart")}
             >
               <ShoppingCart size={24} className="cart-icon" strokeWidth={2} />
               {cartItemCount > 0 ? (
                 <div className="cart-info">
-                  <span className="cart-item-count">{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'}</span>
-                  <span className="cart-total-price">₹{Math.round(cartTotalPrice)}</span>
+                  <span className="cart-item-count">
+                    {cartItemCount} {cartItemCount === 1 ? "item" : "items"}
+                  </span>
+                  <span className="cart-total-price">
+                    ₹{Math.round(cartTotalPrice)}
+                  </span>
                 </div>
               ) : (
                 <span className="cart-empty-text">My Cart</span>

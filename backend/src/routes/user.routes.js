@@ -21,7 +21,6 @@ router.get("/test", (req, res) => {
 
 // Get current user profile (protected route)
 router.get("/profile", async (req, res, next) => {
-  console.log("Profile route matched!");
   next();
 }, Authorization, getCurrentUser);
 

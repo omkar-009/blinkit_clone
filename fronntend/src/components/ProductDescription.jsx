@@ -520,11 +520,6 @@ export default function ProductDescription() {
         <div className="similar-products-section-bottom">
           <h3 className="similar-products-heading">Similar products</h3>
           {(() => {
-            // Debug: Log current state
-            console.log("Render - Product:", product);
-            console.log("Render - Product category:", product?.category);
-            console.log("Render - Loading similar:", loadingSimilar);
-            console.log("Render - Similar products count:", similarProducts.length);
             
             if (!product) {
               return (

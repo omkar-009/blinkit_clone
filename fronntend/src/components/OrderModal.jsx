@@ -59,7 +59,7 @@ export default function OrderModal({ isOpen, onClose, orderSummary, userData, lo
                 <Clock size={20} />
                 <div>
                   <p className="order-delivery-label">Estimated Delivery</p>
-                  <p className="order-delivery-value">16 minutes</p>
+                  <p className="order-delivery-value">15 minutes</p>
                 </div>
               </div>
 
