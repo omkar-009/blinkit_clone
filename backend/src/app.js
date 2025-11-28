@@ -46,19 +46,14 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-console.log('Registering routes...');
 app.use('/api/user', userRoutes);
-console.log('User routes registered at /api/user');
 app.use('/api/products', homeProducts);
-console.log('Product routes registered at /api/products');
 app.use('/api/orders', orderRoutes);
-console.log('Order routes registered at /api/orders');
 
-// Debug: Catch-all for unmatched API routes (must be after all routes)
+// Catch-all for unmatched API routes
 app.use((req, res, next) => {
   if (req.path.startsWith('/api') && !res.headersSent) {
     console.log('❌ Unmatched API route:', req.method, req.originalUrl);
-    console.log('Available routes: /api/user/*, /api/products/*, /api/orders/*');
     return res.status(404).json({
       status: 404,
       success: false,

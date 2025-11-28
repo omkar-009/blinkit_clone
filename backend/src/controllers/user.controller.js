@@ -5,8 +5,6 @@ const { sendResponse } = require("../utils/response");
 // Get current user profile
 const getCurrentUser = async (req, res, next) => {
   try {
-    console.log("getCurrentUser controller called");
-    console.log("req.user:", req.user);
     const userId = req.user?.user_id;
 
     if (!userId) {

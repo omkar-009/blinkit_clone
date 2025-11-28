@@ -28,11 +28,4 @@ router.get("/profile", async (req, res, next) => {
 // Update user profile (protected route)
 router.put("/profile", Authorization, updateUserProfile);
 
-// Debug: Log all routes when router is loaded
-console.log("User routes loaded:");
-console.log("  POST /register");
-console.log("  POST /login");
-console.log("  GET  /profile");
-console.log("  GET  /test");
-
 module.exports = router;

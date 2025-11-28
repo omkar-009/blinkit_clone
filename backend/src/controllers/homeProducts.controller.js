@@ -158,11 +158,6 @@ const getProductById = async (req, res, next) => {
 
     const product = rows[0];
     
-    // Debug: Log the raw product data from database
-    console.log("Raw product from database:", product);
-    console.log("Category from database:", product.category);
-    console.log("Category type:", typeof product.category);
-    
     const baseUrl = `${req.protocol}://${req.get("host")}/uploads/home_page_products/`;
     
     // Parse and format images
@@ -191,9 +186,6 @@ const getProductById = async (req, res, next) => {
       imageUrls: imageUrls,
       details: product.details,
     };
-    
-    console.log("Formatted product being sent:", formattedProduct);
-    console.log("Formatted product category:", formattedProduct.category);
 
     return sendResponse(res, 200, true, "Product fetched successfully", formattedProduct);
   } catch (error) {
@@ -204,8 +196,6 @@ const getProductById = async (req, res, next) => {
 // Search products by name
 const searchProducts = async (req, res, next) => {
   try {
-    console.log("Search endpoint hit!");
-    console.log("Query params:", req.query);
     const { query } = req.query;
 
     if (!query || query.trim().length === 0) {
