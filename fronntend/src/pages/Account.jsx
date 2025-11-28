@@ -76,7 +76,6 @@ export default function Account() {
   const handleSave = async () => {
     try {
       setError("");
-      // Update user profile (you'll need to create this API endpoint)
       const response = await api.put("/user/profile", formData);
       if (response.data.success) {
         setUserData(response.data.data);
