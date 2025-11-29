@@ -79,9 +79,13 @@ export default function DairyProducts() {
     <div className="section">
       <div className="section-header">
         <h5>Dairy, Bread & Eggs</h5>
-        <a href="#" className="see-all">
-          see all
-        </a>
+        <button
+          className="see-all"
+          onClick={() => navigate("/category/dairy")}
+          style={{ background: "none", border: "none", cursor: "pointer" }}
+        >
+          See all
+        </button>
       </div>
 
       <div className="slider-wrapper" style={{ position: "relative" }}>
@@ -111,14 +115,18 @@ export default function DairyProducts() {
             </p>
           ) : products.length > 0 ? (
             products.map((item) => (
-              <div 
-                className="product-card" 
+              <div
+                className="product-card"
                 key={item.id}
                 onClick={() => navigate(`/product/${item.id}`)}
                 style={{ cursor: "pointer" }}
               >
                 <img
-                  src={item.imageUrls && item.imageUrls[0] ? item.imageUrls[0] : "/placeholder.png"}
+                  src={
+                    item.imageUrls && item.imageUrls[0]
+                      ? item.imageUrls[0]
+                      : "/placeholder.png"
+                  }
                   alt={item.name}
                   className="product-image"
                   onError={(e) => {
@@ -131,9 +139,11 @@ export default function DairyProducts() {
                 <div className="product-description">
                   <p className="product-price">₹{item.price}</p>
                   {(() => {
-                    const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+                    const cartItem = cartItems.find(
+                      (cartItem) => cartItem.id === item.id
+                    );
                     const quantity = cartItem?.cartQuantity || 0;
-                    
+
                     if (quantity > 0) {
                       return (
                         <div className="quantity-controls">
@@ -160,7 +170,7 @@ export default function DairyProducts() {
                       );
                     } else {
                       return (
-                        <button 
+                        <button
                           className="add-btn"
                           onClick={(e) => {
                             e.stopPropagation();

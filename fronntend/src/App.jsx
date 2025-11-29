@@ -9,6 +9,7 @@ import OrderHistory from "./pages/OrderHistory";
 import Account from "./pages/Account";
 import SearchResults from "./pages/SearchResults";
 import ProductDescription from "./components/ProductDescription";
+import ProductsPage from "./components/ProductsPage";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -37,6 +38,7 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/product/:id" element={<ProductDescription />} />
+          <Route path="/category/:category" element={<ProductsPage />} />
           </Routes>
         </Router>
       </CartProvider>

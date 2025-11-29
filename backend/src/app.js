@@ -10,6 +10,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/user.routes');
 const homeProducts = require('./routes/homeProducts.routes');
 const orderRoutes = require('./routes/order.routes');
+const productsPage = require('./routes/productsPage');
 
 // Middlewares
 app.use(express.json());
@@ -49,6 +50,7 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRoutes);
 app.use('/api/products', homeProducts);
 app.use('/api/orders', orderRoutes);
+app.use('/api/', productsPage);
 
 // Catch-all for unmatched API routes
 app.use((req, res, next) => {
