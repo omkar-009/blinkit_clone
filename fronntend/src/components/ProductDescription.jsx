@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ChevronDown, ChevronUp, Clock, ShoppingCart, Package, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, ShoppingCart, Package, ChevronRight, ChevronLeft } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import Navbar from "./Navbar";
 import CartNotification from "./CartNotification";
@@ -179,10 +179,10 @@ export default function ProductDescription() {
             endpoint = "/products/snacks";
             break;
           case "mouth_freshners":
-            endpoint = "/products/snacks"; // Fallback to snacks if no specific endpoint
+            endpoint = "/products/snacks";
             break;
           default:
-            endpoint = "/products/snacks"; // Default fallback
+            endpoint = "/products/snacks";
             break;
         }
         
